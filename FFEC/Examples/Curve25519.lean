@@ -150,7 +150,11 @@ example (f : 𝔽 p →+* 𝔽 p) : (Curve25519.map f).A = f 486662 := rfl
 
 /-- **Ristretto** — placeholder. The Ristretto group is the prime-order quotient of Ed25519 by its
 cofactor-8 subgroup (even points, `IsSquare (1 − y²)`); its FFEC math model + encoding are deferred.
-For now this marks the underlying curve. -/
+For now this marks the underlying curve.
+
+The Ristretto math model, the base-point order `ℓ` / `#E = 8ℓ` (point counting), and the torsion
+roadmap are written up in `notes/future-work.md`; the faithful `(j, twist)` hub is in
+`notes/twist-theory.md`. -/
 noncomputable def Ristretto : TwistedEdwardsCurve (𝔽 p) := Ed25519
 
 end Examples

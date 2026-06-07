@@ -74,6 +74,22 @@ theorem addFormula_eq_add (E : TwistedEdwardsCurve F) (P Q : E.Point) :
       map_add (Equiv.addEquiv E.pointEquiv) P Q]
   exact E.pointEquiv_addFormula P Q
 
+/- TODO (computable group / decidable torsion) — deferred; see `notes/future-work.md` §2.
+   The `AddCommGroup E.Point` instance is *noncomputable*: it is transported via `pointEquiv`
+   (Edwards → Montgomery → Weierstrass) and Mathlib's Weierstrass group, whose law is built from the
+   class group of the coordinate ring (using `Classical`). But `addFormula` is the *explicit*
+   coordinate addition (pure field arithmetic), and `addFormula_eq_add` proves it equals that group
+   `+`; with `addFormula_assoc`/`addFormula_comm` + `addCoords_zero_left/right` + `addCoords_inv` we
+   have ALL the group axioms about `addFormula`. So one can either (1) make `addFormula` the
+   instance's `add` (proving the axioms by transport, inside the proofs) — one instance that
+   *computes wherever the field does* — or (2) keep this instance and add a parallel computable
+   `nsmulFormula n P` (iterate `addFormula`), prove `nsmulFormula n P = n • P`, and `native_decide`
+   torsion on it, transferring via the agreement. Either way this yields dalek-style `native_decide`
+   torsion WITH our proven associativity. The genuine constraint: it only *computes* over a
+   *computable* field (`ZMod p`); an abstract `[Field F]` has a possibly-noncomputable inverse
+   (e.g. `ℝ`). `addFormula` is currently tagged `noncomputable` but is pure field arithmetic, so over
+   `ZMod p` that tag should be removable (or a thin computable restatement suffices). -/
+
 -- `DecidableEq F` is used in the proof (Mathlib's point group) though not in this statement's type.
 set_option linter.unusedDecidableInType false in
 /-- **Payoff**: the explicit twisted-Edwards addition is associative — derived for free from
