@@ -12,6 +12,7 @@ variable {p : ℕ} [Fact p.Prime] [Fact (2 < p)]
 
 namespace Edwards
 set_option maxRecDepth 100000 in
+set_option linter.style.longLine false in -- Singular cofactor certs below are single long lines
 -- the addition-agreement identity is high-degree; `ring` (in `linear_combination`) needs budget.
 /-- **Piece C** (X-coordinate match): the Edwards sum's W-`x` equals Weierstrass `addX`.
 Discharge by splitting `y₁ = y₂` / `y₁ ≠ y₂` (so `slope` is concrete), `field_simp`, then
@@ -65,8 +66,8 @@ theorem generic_addX (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
     rw [WeierstrassCurve.Affine.slope_of_X_ne hUUne]
     have h1y2p : (1 : 𝔽 p) + y₂ ≠ 0 := fun h => hy2nm1 (by linear_combination h)
     rw [hU1, hV1]
-    simp only [mul_zero, zero_mul, neg_zero, sub_zero, add_zero, neg_neg, Edwards.toMontgomery,
-      Montgomery.toWeierstrass, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY,
+    simp only [mul_zero, zero_mul, sub_zero, add_zero, Edwards.toMontgomery,
+      Montgomery.toWeierstrass, WeierstrassCurve.Affine.addX,
       toMontU, toMontV, Edwards.addCoords]
     field_simp [h1y2p]
     rw [Edwards.Equation] at h2
@@ -101,8 +102,8 @@ theorem generic_addX (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
     rw [WeierstrassCurve.Affine.slope_of_X_ne hUUne]
     have h1y1p : (1 : 𝔽 p) + y₁ ≠ 0 := fun h => hy1nm1 (by linear_combination h)
     rw [hU2, hV2]
-    simp only [mul_zero, zero_mul, neg_zero, sub_zero, add_zero, neg_neg, Edwards.toMontgomery,
-      Montgomery.toWeierstrass, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY,
+    simp only [mul_zero, zero_mul, sub_zero, add_zero, Edwards.toMontgomery,
+      Montgomery.toWeierstrass, WeierstrassCurve.Affine.addX,
       toMontU, toMontV, Edwards.addCoords]
     field_simp [h1y1p]
     rw [Edwards.Equation] at h1
@@ -162,7 +163,7 @@ theorem generic_addX (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
         = 1 - E.d * y₁ ^ 2 * x₁ ^ 2 from by ring]; exact hnegD)]
       linear_combination -hh
     simp only [Edwards.toMontgomery, Montgomery.toWeierstrass, WeierstrassCurve.Affine.addX,
-      WeierstrassCurve.Affine.negY, toMontU, toMontV, Edwards.addCoords, mul_zero, zero_mul,
+      WeierstrassCurve.Affine.negY, toMontU, toMontV, Edwards.addCoords, zero_mul,
       sub_zero, add_zero]
     have h2c : (1 : 𝔽 p) - -1 ≠ 0 := by
       rw [show (1 : 𝔽 p) - -1 = 2 from by ring]; exact Montgomery.two_ne_zero
@@ -186,7 +187,7 @@ theorem generic_addX (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
         = 1 - E.d * y₁ * y₂ * x₁ * x₂ from by ring]; exact hneg')]
       linear_combination -hh
     simp only [Edwards.toMontgomery, Montgomery.toWeierstrass, WeierstrassCurve.Affine.addX,
-      WeierstrassCurve.Affine.negY, toMontU, toMontV, Edwards.addCoords]
+      toMontU, toMontV, Edwards.addCoords]
     field_simp [hslopeden, hsumnum, hneg']
     rw [Edwards.Equation] at h1 h2
     -- Cofactors from an external Gröbner `lift` of the cleared identity mod ⟨h1, h2⟩ (Singular);
@@ -214,6 +215,7 @@ theorem generic_addX (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
    If after the rewrite it still overflows, split `B · addX = addY · sumX` into chained
    sub-identities (each a smaller `ring`). -/
 set_option maxRecDepth 100000 in
+set_option linter.style.longLine false in -- Singular cofactor cert below is a single long line
 set_option maxHeartbeats 2000000 in
 -- one degree-8 secant certificate (~10× default); STOPGAP — see the TODO above to remove it.
 /-- The **secant** case of `generic_addY`, split off so its (large) certificate occupies
@@ -299,7 +301,7 @@ theorem generic_addY_secant (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p
     simp only [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY]
     rw [hAX0]
     simp only [Edwards.toMontgomery, Montgomery.toWeierstrass, WeierstrassCurve.Affine.negY,
-      toMontU, toMontV, mul_zero, zero_mul, sub_zero, add_zero]
+      toMontU, toMontV, mul_zero, sub_zero]
     field_simp [hslopeden]
     ring
   · have hsumXnum : x₁ * y₂ + y₁ * x₂ ≠ 0 := hsX
@@ -316,6 +318,7 @@ theorem generic_addY_secant (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p
 
 
 set_option maxRecDepth 100000 in
+set_option linter.style.longLine false in -- Singular cofactor certs below are single long lines
 -- the addition-agreement identity is high-degree; `ring` (in `linear_combination`) needs budget.
 /-- **Piece D** (Y-coordinate match): the Edwards sum's W-`y` equals Weierstrass `addY`. -/
 theorem generic_addY (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
@@ -366,9 +369,10 @@ theorem generic_addY (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
     have hUUne : E.toMontgomery.B * toMontU (-1 : 𝔽 p) ≠ E.toMontgomery.B * toMontU y₂ := by
       rw [hU1m, mul_zero]; exact fun h => (mul_ne_zero hBne hU2ne) h.symm
     rw [WeierstrassCurve.Affine.slope_of_X_ne hUUne, hU1m, hV1m]
-    simp only [mul_zero, zero_mul, neg_zero, sub_zero, add_zero, neg_neg, Edwards.toMontgomery,
+    simp only [mul_zero, zero_mul, sub_zero, add_zero, Edwards.toMontgomery,
       Montgomery.toWeierstrass, WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY,
-      WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY, toMontU, toMontV, Edwards.addCoords]
+      WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY, toMontU, toMontV,
+      Edwards.addCoords]
     field_simp [h1y2p, hx2]
     rw [Edwards.Equation] at h2
     linear_combination (-4096 * x₂ * y₂ ^ 3 - 12288 * x₂ * y₂ ^ 2 - 12288 * x₂ * y₂ - 4096 * x₂) * h2
@@ -393,9 +397,10 @@ theorem generic_addY (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
     have hUUne : E.toMontgomery.B * toMontU y₁ ≠ E.toMontgomery.B * toMontU (-1 : 𝔽 p) := by
       rw [hU1m, mul_zero]; exact mul_ne_zero hBne hU1ne
     rw [WeierstrassCurve.Affine.slope_of_X_ne hUUne, hU1m, hV1m]
-    simp only [mul_zero, zero_mul, neg_zero, sub_zero, add_zero, neg_neg, Edwards.toMontgomery,
+    simp only [mul_zero, zero_mul, sub_zero, add_zero, Edwards.toMontgomery,
       Montgomery.toWeierstrass, WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY,
-      WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY, toMontU, toMontV, Edwards.addCoords]
+      WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY, toMontU, toMontV,
+      Edwards.addCoords]
     field_simp [h1y1p, hx1]
     rw [Edwards.Equation] at h1
     linear_combination (-4) * h1
@@ -462,7 +467,7 @@ theorem generic_addY (E : Edwards (𝔽 p)) {x₁ y₁ x₂ y₂ : 𝔽 p}
         linear_combination -hh
       simp only [Edwards.toMontgomery, Montgomery.toWeierstrass, WeierstrassCurve.Affine.addY,
         WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY,
-        toMontU, toMontV, Edwards.addCoords, mul_zero, zero_mul, sub_zero, add_zero]
+        toMontU, toMontV, Edwards.addCoords, zero_mul, sub_zero, add_zero]
       have h11 : (1 : 𝔽 p) + 1 ≠ 0 := by
         rw [show (1 : 𝔽 p) + 1 = 2 by ring]; exact Montgomery.two_ne_zero
       field_simp [hy1p, hsumnumD, hnegD, h2c, hy10, h11]

@@ -1,39 +1,30 @@
 import FEC.Edwards.AddFormulaCerts
 
 /-!
-# Prototype: bridging an implementation's explicit Edwards addition to the proven group law
+# Edwards explicit addition agrees with the transported Weierstrass group law
 
-This file demonstrates how a verification project (e.g. `curve25519-dalek-lean-verify`) can obtain
-the hard theorem — **associativity of Edwards addition** — *for free* from FEC, instead of proving
-it directly (the dalek repo leaves `add_assoc_Ed25519` as `sorry`, citing the Hales–Raya IJCAR 2020
-formal proof).
+This file proves that the **explicit** (rational) twisted-Edwards addition formula agrees with the
+group operation transported from Mathlib's Weierstrass group along the bridge
+`E.pointEquiv : E.Point ≃ W.Point` (built in `FEC.Edwards.Defs` via Edwards → Montgomery →
+Weierstrass). The agreement lemma `add'_eq_add` then yields **associativity of Edwards addition for
+free** (`add'_assoc`) — the exact theorem `curve25519-dalek-lean-verify` leaves as `sorry`
+(`add_assoc_Ed25519`, citing the Hales–Raya IJCAR 2020 formal proof). A verification project adopts
+this by transporting its points into `E.Point` (or bridging to it).
 
-The bridge `E.pointEquiv : E.Point ≃ W.Point` is already proven in `FEC.Edwards.Defs` (no `sorry`):
-it injects Edwards points into Mathlib's Weierstrass group (via Edwards → Montgomery → Weierstrass).
-The only remaining piece is the **addition-agreement lemma** `add'_eq_add` — that the *explicit*
-rational addition formula agrees with the transported group law. Once it holds, `add'_assoc` is
-immediate. This is the template a verification project would instantiate (with its `Point`/`add`
-replaced by FEC's, or bridged to them).
+## Structure of the proof
 
-## Status: decomposed into easy pieces; only the coordinate identities remain
-
-`add'_eq_add` → `pointEquiv_add'` (dispatcher) → four case lemmas. **Three of four cases are fully
-proven** (`id_left`, `id_right`, `inverse`), built on the proven supporting lemmas
-`pointEquiv_zero_one`, `pointEquiv_some`, `pointEquiv_eq_some` (the *unified* computation absorbing
-the `(0,−1)` 2-torsion via `0/0 = 0`, removing input-special-point subcases), `pointEquiv_neg`,
-`toMontV_neg`, `addCoords_inv`, `addCoords_zero_left/right`.
-
-The remaining `pointEquiv_add'_generic` is reduced — via `pointEquiv_eq_some` (for `P`, `Q`, and the
-sum) and Mathlib's `add_some` — to **four isolated residual pieces**:
-* **A** (`hsumid`): the sum is not the identity `(0,1)` — from `¬inv` (else `Q = −P`).
-* **B** (`hxy`): the two W-images are not Weierstrass-inverses — from `¬inv` (`negY = −y`, `B ≠ 0`,
-  `toMontU`/`toMontV` injectivity).
-* **C / D**: the X- and Y-coordinate identities
-  `B·toMontU(sumY) = W.addX U₁ U₂ ℓ`,  `B²·toMontV(sumX,sumY) = W.addY …`  (`ℓ = W.slope …`).
-  Discharge: split `y₁ = y₂` (tangent, `slope_of_Y_ne`) vs `y₁ ≠ y₂` (secant, `slope_of_X_ne`) to
-  make `ℓ` concrete, then `field_simp` (denominators nonzero via `denoms_ne_zero`,
-  `one_sub_y_ne_zero`, `U₂ − U₁ ≠ 0`) and `linear_combination c₁·h1 + c₂·h2` (coefficients via
-  `polyrith` or by eliminating `y₁²`, `y₂²`). These two are the only computational leaves.
+`add'_eq_add` ← `pointEquiv_add'` (dispatcher) ← four case lemmas, all fully proven:
+* `pointEquiv_add'_id_left` / `id_right` / `inverse` — the identity and inverse cases, built on
+  `pointEquiv_eq_some` (a *unified* computation absorbing the `(0,−1)` 2-torsion via `0/0 = 0`),
+  `pointEquiv_neg`, `toMontV_neg`, `addCoords_inv`, `addCoords_zero_left/right`.
+* `pointEquiv_add'_generic` — neither point the identity, not inverses. Reduced via
+  `pointEquiv_eq_some` and Mathlib's `add_some` to four residual pieces (in `AddFormulaBase` and
+  `AddFormulaCerts`):
+  - **A** `generic_sumNeId`: the sum is not the identity `(0,1)`.
+  - **B** `generic_notWInv`: the two W-images are not Weierstrass-inverses.
+  - **C** `generic_addX` / **D** `generic_addY`: the X- and Y-coordinate identities, discharged by
+    splitting tangent (`slope_of_Y_ne`) vs secant (`slope_of_X_ne`), `field_simp`, and a
+    `linear_combination` with Singular-computed cofactors that `ring` re-checks.
 -/
 
 namespace FEC

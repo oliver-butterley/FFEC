@@ -208,8 +208,8 @@ theorem pointEquiv_add'_id_right (E : Edwards (𝔽 p)) {x₁ y₁ : 𝔽 p}
     simp only [Edwards.add', E.addCoords_zero_right]
   rw [hadd, pointEquiv_zero_one, add_zero]
 
-/-- **Case 2 (inverse)** — `Q = (−x, y) = −P`; both sides are `0` (Weierstrass `add_of_Y_eq`).
-note (deferred): needs the generic `pointEquiv` computation + `add'(P,−P)=(0,1)` + `negY = −y`. -/
+/-- **Case 2 (inverse)** — `Q = (−x, y) = −P`: `add' P (−P) = (0,1)` (via `addCoords_inv`) with
+`pointEquiv (0,1) = 0`, while the RHS `pointEquiv P + pointEquiv (−P) = 0` (`pointEquiv_neg`). -/
 theorem pointEquiv_add'_inverse (E : Edwards (𝔽 p)) {x y : 𝔽 p}
     (h : E.Equation x y) (h' : E.Equation (-x) y) :
     E.pointEquiv (E.add' (.mk x y h) (.mk (-x) y h'))
