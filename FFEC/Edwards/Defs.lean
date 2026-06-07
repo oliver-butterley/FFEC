@@ -54,6 +54,15 @@ theorem d_ne_zero (E : TwistedEdwardsCurve R) : E.d ≠ 0 := by
 /-- `a ≠ d` (else the non-square `d` would equal the square `a`). -/
 theorem a_ne_d (E : TwistedEdwardsCurve R) : E.a ≠ E.d := fun h => E.hd (h ▸ E.ha)
 
+/-- Two points are equal once their coordinates agree (the on-curve proof is irrelevant). -/
+theorem Point.ext {E : TwistedEdwardsCurve R} {x₁ y₁ : R} {h₁ : E.Equation x₁ y₁}
+    {x₂ y₂ : R} {h₂ : E.Equation x₂ y₂} (hx : x₁ = x₂) (hy : y₁ = y₂) :
+    (Point.mk x₁ y₁ h₁ : E.Point) = Point.mk x₂ y₂ h₂ := by subst hx; subst hy; rfl
+
+/-- The identity `(0, 1)` makes `E.Point` inhabited. -/
+instance (E : TwistedEdwardsCurve R) : Inhabited E.Point :=
+  ⟨.mk 0 1 (by rw [TwistedEdwardsCurve.Equation]; ring)⟩
+
 end TwistedEdwardsCurve
 
 section Field
@@ -79,6 +88,10 @@ noncomputable def TwistedEdwardsCurve.toMontgomery (E : TwistedEdwardsCurve F) :
       ring
     rw [isUnit_iff_ne_zero, key]
     exact div_ne_zero (mul_ne_zero h64 (mul_ne_zero E.a_ne_zero E.d_ne_zero)) (pow_ne_zero 3 had)
+
+/-- The `j`-invariant of a twisted Edwards curve, taken through its Montgomery (hence Weierstrass)
+form. (`E.toMontgomery` is elliptic, so `MontgomeryCurve.j` is available.) -/
+noncomputable def TwistedEdwardsCurve.j (E : TwistedEdwardsCurve F) : F := E.toMontgomery.j
 
 /-! ### TwistedEdwardsCurve ⇄ MontgomeryCurve point bijection (top-down outline)
 

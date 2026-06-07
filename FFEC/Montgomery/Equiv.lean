@@ -92,5 +92,12 @@ noncomputable def pointEquiv (M : MontgomeryCurve F) :
       simp only [WeierstrassCurve.Affine.Point.some.injEq]
       refine ⟨?_, ?_⟩ <;> field_simp
 
+/-- **Computation lemma**: the bridge sends the affine MontgomeryCurve point `(x, y)` to the
+Weierstrass point `(B·x, B²·y)` (`B = M.B`). Unfolds the `match` in `pointEquiv`. -/
+theorem pointEquiv_some (M : MontgomeryCurve F) {x y : F} (h : M.Equation x y) :
+    M.pointEquiv (MontgomeryCurve.Point.some x y h)
+      = .some (M.B * x) (M.B ^ 2 * y)
+          ((WeierstrassCurve.Affine.equation_iff_nonsingular).mp (equation_toW M h)) := rfl
+
 end MontgomeryCurve
 

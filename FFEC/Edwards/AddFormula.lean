@@ -87,8 +87,8 @@ theorem addFormula_eq_add (E : TwistedEdwardsCurve F) (P Q : E.Point) :
    torsion on it, transferring via the agreement. Either way this yields dalek-style `native_decide`
    torsion WITH our proven associativity. The genuine constraint: it only *computes* over a
    *computable* field (`ZMod p`); an abstract `[Field F]` has a possibly-noncomputable inverse
-   (e.g. `ℝ`). `addFormula` is currently tagged `noncomputable` but is pure field arithmetic, so over
-   `ZMod p` that tag should be removable (or a thin computable restatement suffices). -/
+   (e.g. `ℝ`). `addFormula` is currently tagged `noncomputable` but is pure field arithmetic, so
+   over `ZMod p` that tag should be removable (or a thin computable restatement suffices). -/
 
 -- `DecidableEq F` is used in the proof (Mathlib's point group) though not in this statement's type.
 set_option linter.unusedDecidableInType false in
@@ -130,6 +130,15 @@ noncomputable def pointAddEquiv (E : TwistedEdwardsCurve F) :
   change E.pointAddEquiv (-(TwistedEdwardsCurve.Point.mk x y h)) = E.pointEquiv (.mk (-x) y _)
   rw [map_neg, E.pointEquiv_neg h]
   rfl
+
+/-- Addition in `E.Point` in explicit coordinates: the complete twisted-Edwards addition law
+(`addCoords`). A restatement of `addFormula_eq_add` on the constructors. -/
+@[simp] theorem add_mk (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
+    (h₁ : E.Equation x₁ y₁) (h₂ : E.Equation x₂ y₂) :
+    (TwistedEdwardsCurve.Point.mk x₁ y₁ h₁) + (TwistedEdwardsCurve.Point.mk x₂ y₂ h₂)
+      = .mk (E.addCoords x₁ y₁ x₂ y₂).1 (E.addCoords x₁ y₁ x₂ y₂).2
+          (E.addCoords_onCurve h₁ h₂) := by
+  rw [← addFormula_eq_add]; rfl
 
 /-- The bridge to Mathlib's Weierstrass group is injective (already proven, no `sorry`). -/
 example (E : TwistedEdwardsCurve F) : Function.Injective E.pointEquiv := E.pointEquiv.injective

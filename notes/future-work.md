@@ -133,6 +133,52 @@ It likewise needs Mathlib infrastructure that does not yet exist (a twist API, t
 
 ---
 
+## 6. What curve25519-dalek needs from Edwards/Montgomery that FFEC lacks
+
+For the application as the consumer: results dalek's verification relies on at the *math-model*
+layer (Edwards/Montgomery — not the implementation-representation layer, which is dalek's own) that
+FFEC does not yet provide. First, the flip side worth stating — FFEC already gives dalek something
+it *lacks*: a **proven `add_assoc`** (dalek's Edwards associativity is `sorry`).
+
+Gaps, easiest first:
+
+1. **Montgomery x-only ladder identities** (`uADD`, `uDBL`) — *easy, no infrastructure*. The X25519
+   Montgomery ladder is verified against the differential relations
+   `u(P+Q)·u(P−Q)·(u_P−u_Q)² = (u_P·u_Q − 1)²` and `4·u(2P)·u_P·(u_P²+A·u_P+1) = (u_P²−1)²`.
+   FFEC has the full-coordinate `add_some`/`double` but not these `u`-only relations; they are
+   derivable from `add_some`/`double` + the curve equation by `field_simp; ring` (dalek's proofs are
+   ~60–75 lines, no certificates).
+
+2. **Curve-specific quadratic-character facts** — *easy*. dalek proves `A²−4` and `A−2` non-square,
+   `A+2` square for Curve25519 (used in the Edwards↔Montgomery birational map and Ristretto). FFEC
+   proves the *general* analogues (`TwistedEdwardsCurve.no_root` = no rational 2-torsion beyond
+   `(0,0)`; completeness `¬IsSquare d`), so these mostly specialise out, but the named facts aren't
+   all exposed. Adding them is a `legendreSym` + `norm_num` exercise (like `edwardsD_not_square`).
+
+3. **Base points** — *partly easy, partly §1/§4*. The Ed25519 base point `B` and Curve25519 `u = 9`:
+   on-curve is trivial to add in `Examples`; their order `ℓ` needs point counting (§1).
+
+4. **Cofactor / small-order torsion** — *needs §2*. The Ed25519 8-torsion (explicit generator,
+   `8•G = 0`, `4•G ≠ 0`, the torsion table) used for cofactor clearing and small-subgroup checks.
+   dalek does this by `native_decide` on its *computable* group; FFEC needs the **computable-group
+   upgrade** (§2) to match, or symbolic torsion proofs.
+
+5. **Scalar multiplication / the ladder as an algorithm** — *needs §2*. `n • P` exists abstractly
+   (from the `AddCommGroup`) but is noncomputable; a computable/ladder form for X25519 needs §2.
+
+6. **Ristretto** (prime-order quotient + encode/decode) — *needs §1 + §3*.
+
+Not a math gap but the connection point: dalek's ~11 coordinate/byte representations
+(extended/projective/completed/Niels, compressed) attach to the math model via `toPoint`; FFEC
+supplies the affine `Point` and the explicit group law they map onto (and `add_mk` matches dalek's
+`add_coords` exactly). The representations themselves are the application's, not FFEC's scope.
+
+**Quick wins (no research-gated infrastructure):** items 1 and 2 — the `uADD`/`uDBL` differential
+identities and the Curve25519 Legendre facts — could be added immediately and would directly serve
+the X25519 and birational-map verification.
+
+---
+
 ## Summary: the dependency at the root
 
 Almost everything deferred here funnels through **§1 (point counting / `#E`)**: base-point order,

@@ -17,9 +17,7 @@ omit [DecidableEq F] [NeZero (2 : F)] in
 theorem toMontV_eq_toMontU_div (x y : F) : toMontV x y = toMontU y / x := by
   unfold toMontV toMontU; rw [div_div]
 
-set_option maxRecDepth 100000 in
 set_option linter.style.longLine false in -- Singular cofactor certs below are single long lines
--- the addition-agreement identity is high-degree; `ring` (in `linear_combination`) needs budget.
 /-- **Piece C** (X-coordinate match): the TwistedEdwardsCurve sum's W-`x` equals Weierstrass `addX`.
 Discharge by splitting `y₁ = y₂` / `y₁ ≠ y₂` (so `slope` is concrete), `field_simp`, then
 `linear_combination` against `h1, h2`. -/
@@ -317,9 +315,7 @@ theorem generic_addY_secant (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F
       (512*E.d*x₁^4*y₁^5*x₂^2-1536*E.d*x₁^4*y₁^4*x₂^2*y₂+1536*E.d*x₁^4*y₁^3*x₂^2*y₂^2-512*E.d*x₁^4*y₁^2*x₂^2*y₂^3+512*E.d*x₁^4*y₁^4*x₂^2+256*E.a*x₁^4*y₁^3*x₂^2*y₂+64*x₁^3*y₁^5*x₂*y₂^2-512*E.a*x₁^4*y₁^2*x₂^2*y₂^2-512*E.d*x₁^4*y₁^2*x₂^2*y₂^2-64*x₁^2*y₁^5*x₂^2*y₂^2+64*x₁^4*y₁^4*y₂^3-192*x₁^3*y₁^4*x₂*y₂^3+256*E.a*x₁^4*y₁*x₂^2*y₂^3+256*E.d*x₁^4*y₁*x₂^2*y₂^3+128*x₁^2*y₁^4*x₂^2*y₂^3-512*E.a*x₁^4*y₁^3*x₂^2+128*x₁^3*y₁^5*x₂*y₂+1024*E.a*x₁^4*y₁^2*x₂^2*y₂+128*x₁^2*y₁^5*x₂^2*y₂+128*x₁^4*y₁^4*y₂^2-256*x₁^3*y₁^4*x₂*y₂^2-512*E.a*x₁^4*y₁*x₂^2*y₂^2-384*x₁^2*y₁^4*x₂^2*y₂^2-256*x₁^4*y₁^3*y₂^3+384*x₁^3*y₁^3*x₂*y₂^3+128*x₁^2*y₁^3*x₂^2*y₂^3+64*x₁^3*y₁^5*x₂-512*E.a*x₁^4*y₁^2*x₂^2-320*x₁^2*y₁^5*x₂^2+64*x₁^4*y₁^4*y₂-192*x₁^3*y₁^4*x₂*y₂+256*E.a*x₁^4*y₁*x₂^2*y₂+896*x₁^2*y₁^4*x₂^2*y₂-512*x₁^4*y₁^3*y₂^2+256*x₁^3*y₁^3*x₂*y₂^2-512*x₁^2*y₁^3*x₂^2*y₂^2+384*x₁^4*y₁^2*y₂^3-128*x₁^2*y₁^2*x₂^2*y₂^3-128*x₁^3*y₁^4*x₂-640*x₁^2*y₁^4*x₂^2-256*x₁^4*y₁^3*y₂-128*x₁^3*y₁^3*x₂*y₂+384*x₁^2*y₁^3*x₂^2*y₂+768*x₁^4*y₁^2*y₂^2+128*x₁^3*y₁^2*x₂*y₂^2+384*x₁^2*y₁^2*x₂^2*y₂^2-256*x₁^4*y₁*y₂^3-384*x₁^3*y₁*x₂*y₂^3-128*x₁^2*y₁*x₂^2*y₂^3+256*x₁^2*y₁^3*x₂^2+384*x₁^4*y₁^2*y₂+256*x₁^3*y₁^2*x₂*y₂-896*x₁^2*y₁^2*x₂^2*y₂-512*x₁^4*y₁*y₂^2-320*x₁^3*y₁*x₂*y₂^2+576*x₁^2*y₁*x₂^2*y₂^2+64*x₁^4*y₂^3+192*x₁^3*x₂*y₂^3+128*x₁^3*y₁^2*x₂+640*x₁^2*y₁^2*x₂^2-256*x₁^4*y₁*y₂-512*x₁^2*y₁*x₂^2*y₂+128*x₁^4*y₂^2+128*x₁^3*x₂*y₂^2-64*x₁^3*y₁*x₂+64*x₁^2*y₁*x₂^2+64*x₁^4*y₂-64*x₁^3*x₂*y₂) * h2
 
 
-set_option maxRecDepth 100000 in
 set_option linter.style.longLine false in -- Singular cofactor certs below are single long lines
--- the addition-agreement identity is high-degree; `ring` (in `linear_combination`) needs budget.
 /-- **Piece D** (Y-coordinate match): the TwistedEdwardsCurve sum's W-`y` equals Weierstrass `addY`. -/
 theorem generic_addY (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
     (h1 : E.Equation x₁ y₁) (h2 : E.Equation x₂ y₂)

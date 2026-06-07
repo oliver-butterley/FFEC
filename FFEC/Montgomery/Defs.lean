@@ -52,5 +52,13 @@ def map (M : MontgomeryCurve R) (f : R →+* R') : MontgomeryCurve R' where
 @[simp] theorem map_A (M : MontgomeryCurve R) (f : R →+* R') : (M.map f).A = f M.A := rfl
 @[simp] theorem map_B (M : MontgomeryCurve R) (f : R →+* R') : (M.map f).B = f M.B := rfl
 
+/-- Two affine points are equal once their coordinates agree (the on-curve proof is irrelevant). -/
+theorem Point.some_ext {M : MontgomeryCurve R} {x₁ y₁ : R} {h₁ : M.Equation x₁ y₁}
+    {x₂ y₂ : R} {h₂ : M.Equation x₂ y₂} (hx : x₁ = x₂) (hy : y₁ = y₂) :
+    (Point.some x₁ y₁ h₁ : M.Point) = Point.some x₂ y₂ h₂ := by subst hx; subst hy; rfl
+
+/-- The point at infinity makes `M.Point` inhabited. -/
+instance (M : MontgomeryCurve R) : Inhabited M.Point := ⟨.zero⟩
+
 end MontgomeryCurve
 
