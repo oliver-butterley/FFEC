@@ -108,6 +108,21 @@ example (P : Ed25519.Point) : P + (-P) = 0 := add_neg_cancel P
 noncomputable example : Ed25519.Point ≃ (Ed25519.toMontgomery).toWeierstrass.toAffine.Point :=
   Ed25519.pointEquiv
 
+/-- …and that bridge is an *additive* equivalence (a group isomorphism), via the new API. -/
+noncomputable example :
+    Ed25519.Point ≃+ (Ed25519.toMontgomery).toWeierstrass.toAffine.Point :=
+  Ed25519.pointAddEquiv
+
+example (P Q : Ed25519.Point) :
+    Ed25519.pointAddEquiv (P + Q) = Ed25519.pointAddEquiv P + Ed25519.pointAddEquiv Q :=
+  map_add _ _ _
+
+-- `zero_def`/`neg_mk` fire as `simp` lemmas, computing the group ops in explicit coordinates.
+example : (0 : Ed25519.Point) = .mk 0 1 (by rw [TwistedEdwardsCurve.Equation]; ring) := by simp
+example (x y : 𝔽 p) (h : Ed25519.Equation x y) :
+    -(TwistedEdwardsCurve.Point.mk x y h)
+      = .mk (-x) y (by rw [TwistedEdwardsCurve.Equation] at h ⊢; linear_combination h) := by simp
+
 /-! ## Curve25519 (MontgomeryCurve) -/
 
 /-- **Curve25519** Montgomery curve `v² = u³ + 486662 u² + u` (`A = 486662`, `B = 1`). -/
@@ -123,6 +138,13 @@ noncomputable def Curve25519 : MontgomeryCurve (𝔽 p) where
 noncomputable example : AddCommGroup Curve25519.Point := inferInstance
 
 example (P Q R : Curve25519.Point) : P + Q + R = P + (Q + R) := add_assoc P Q R
+example (P Q : Curve25519.Point) :
+    Curve25519.pointAddEquiv (P + Q) = Curve25519.pointAddEquiv P + Curve25519.pointAddEquiv Q :=
+  map_add _ _ _
+example : (0 : Curve25519.Point) = .zero := by simp
+
+-- Base change is available (mirrors `WeierstrassCurve.map`): reduce Curve25519 along any ring hom.
+example (f : 𝔽 p →+* 𝔽 p) : (Curve25519.map f).A = f 486662 := rfl
 
 /-! ## Ristretto (placeholder) -/
 

@@ -90,6 +90,31 @@ theorem addFormula_comm (E : TwistedEdwardsCurve F) (P Q : E.Point) :
     E.addFormula P Q = E.addFormula Q P := by
   simp only [addFormula_eq_add]; rw [add_comm]
 
+/-! ## Group API in explicit coordinates -/
+
+/-- The transport bridge `E.Point ≃ W.Point` as an **additive** equivalence (Edwards → Montgomery →
+Weierstrass): the group is the transport along `pointEquiv`, so this is a group isomorphism by
+construction. -/
+noncomputable def pointAddEquiv (E : TwistedEdwardsCurve F) :
+    E.Point ≃+ (E.toMontgomery).toWeierstrass.toAffine.Point :=
+  Equiv.addEquiv E.pointEquiv
+
+/-- The group identity of `E.Point` is the affine point `(0, 1)`. -/
+@[simp] theorem zero_def (E : TwistedEdwardsCurve F) :
+    (0 : E.Point) = .mk 0 1 (by rw [TwistedEdwardsCurve.Equation]; ring) := by
+  refine E.pointEquiv.injective ?_
+  change E.pointAddEquiv 0 = E.pointEquiv (.mk 0 1 _)
+  rw [map_zero, E.pointEquiv_zero_one]
+
+/-- Negation in `E.Point` is the twisted-Edwards inverse `(x, y) ↦ (−x, y)`. -/
+@[simp] theorem neg_mk (E : TwistedEdwardsCurve F) {x y : F} (h : E.Equation x y) :
+    -(TwistedEdwardsCurve.Point.mk x y h)
+      = .mk (-x) y (by rw [TwistedEdwardsCurve.Equation] at h ⊢; linear_combination h) := by
+  refine E.pointEquiv.injective ?_
+  change E.pointAddEquiv (-(TwistedEdwardsCurve.Point.mk x y h)) = E.pointEquiv (.mk (-x) y _)
+  rw [map_neg, E.pointEquiv_neg h]
+  rfl
+
 /-- The bridge to Mathlib's Weierstrass group is injective (already proven, no `sorry`). -/
 example (E : TwistedEdwardsCurve F) : Function.Injective E.pointEquiv := E.pointEquiv.injective
 
