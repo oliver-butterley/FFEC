@@ -1,4 +1,4 @@
-import FEC.Montgomery.ToWeierstrass
+import FFEC.Montgomery.ToWeierstrass
 
 /-!
 # MontgomeryCurve ≃ Weierstrass on points (the per-model datum)

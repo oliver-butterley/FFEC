@@ -1,4 +1,4 @@
-import FEC.Montgomery.Group
+import FFEC.Montgomery.Group
 
 /-!
 # TwistedEdwardsCurve model (composes through MontgomeryCurve)
@@ -42,6 +42,7 @@ def Equation (E : TwistedEdwardsCurve R) (x y : R) : Prop :=
 Completeness (in the structure) means these affine points form the whole group. -/
 inductive Point (E : TwistedEdwardsCurve R)
   | mk (x y : R) (h : E.Equation x y)
+  deriving DecidableEq
 
 /-- `a ≠ 0` (a nonzero square, by hypothesis). -/
 theorem a_ne_zero (E : TwistedEdwardsCurve R) : E.a ≠ 0 := E.ha0

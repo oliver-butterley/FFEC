@@ -1,11 +1,11 @@
-import FEC.Edwards.AddFormulaCerts
+import FFEC.Edwards.AddFormulaCerts
 
 /-!
 # TwistedEdwardsCurve explicit addition agrees with the transported Weierstrass group law
 
 This file proves that the **explicit** (rational) twisted-Edwards addition formula agrees with the
 group operation transported from Mathlib's Weierstrass group along the bridge
-`E.pointEquiv : E.Point ≃ W.Point` (built in `FEC.Edwards.Defs` via
+`E.pointEquiv : E.Point ≃ W.Point` (built in `FFEC.Edwards.Defs` via
 TwistedEdwardsCurve → MontgomeryCurve → Weierstrass). The agreement lemma `addFormula_eq_add` then
 yields **associativity of TwistedEdwardsCurve addition for free** (`addFormula_assoc`) — the exact
 theorem `curve25519-dalek-lean-verify` leaves as `sorry`
@@ -121,7 +121,7 @@ example (E : TwistedEdwardsCurve F) : Function.Injective E.pointEquiv := E.point
 /-! ## The core demonstration (no `sorry`)
 
 The theorem `curve25519-dalek-lean-verify` leaves as `sorry` — associativity of the
-TwistedEdwardsCurve group — is **fully proven** in FEC, available as the ordinary `add_assoc` on
+TwistedEdwardsCurve group — is **fully proven** in FFEC, available as the ordinary `add_assoc` on
 `E.Point`, because the group is
 transported from Mathlib's Weierstrass group law. A verification project that adopts this group
 (transporting its points in, rather than re-deriving a group from an explicit formula) gets

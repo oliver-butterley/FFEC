@@ -2,7 +2,7 @@
 
 > **Status: deferred / future workstream.** This document is a design and future-notes plan,
 > not a description of code that exists. The current development *dropped* its earlier abstract
-> `Curve` hub (`FEC/Curve.lean`), because that hub was keyed on the `j`-invariant **alone**, was
+> `Curve` hub (`FFEC/Curve.lean`), because that hub was keyed on the `j`-invariant **alone**, was
 > unused (the concrete models each carry their own `toWeierstrass` and never route through it),
 > and — most importantly — is **mathematically unfaithful** over a non-algebraically-closed
 > field: it cannot tell a curve apart from its twists. This document is the plan to redo the hub
@@ -45,7 +45,7 @@ are not `ℚ`-isomorphic — they are *quadratic twists* of one another, related
 an isomorphism defined only over `ℚ(√2)`.
 
 So the old hub `structure Curve (R) where j : R; D : Rˣ`, whose `toWeierstrass` was literally
-`WeierstrassCurve.ofJ c.j` (ignoring `D` entirely; see the deleted `FEC/Curve.lean`), classifies
+`WeierstrassCurve.ofJ c.j` (ignoring `D` entirely; see the deleted `FFEC/Curve.lean`), classifies
 curves only up to *geometric* (over `F̄`) isomorphism. Its `D` field was decorative. That is the
 defect this workstream fixes.
 
@@ -534,8 +534,8 @@ hub. T5/T6 complete the special `j`; T8 is the rigidity upgrade; T9 is a future 
 
 **This repo:**
 
-- `FEC/Curve.lean` *(dropped)* — the unfaithful `j`-only hub this document replaces; its
+- `FFEC/Curve.lean` *(dropped)* — the unfaithful `j`-only hub this document replaces; its
   `add_forced_of_equiv_additive` is the weak uniqueness lemma to be upgraded in T8.
-- `FEC/Framework.lean` — `GroupTransfer` / `crossAddEquiv` (retained; the same-group transport this
+- `FFEC/Framework.lean` — `GroupTransfer` / `crossAddEquiv` (retained; the same-group transport this
   workstream's `routesThroughHub` refines to a curve-level iso).
 - `MODELS.md` — the Montgomery / twisted Edwards / Ristretto model inventory routed in T7.

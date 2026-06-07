@@ -1,4 +1,4 @@
-import FEC.Montgomery.Defs
+import FFEC.Montgomery.Defs
 
 /-!
 # MontgomeryCurve → Weierstrass

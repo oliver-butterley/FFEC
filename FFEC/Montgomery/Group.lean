@@ -1,5 +1,5 @@
-import FEC.Montgomery.Equiv
-import FEC.Framework
+import FFEC.Montgomery.Equiv
+import FFEC.Framework
 
 /-!
 # MontgomeryCurve point group (transported)

@@ -1,4 +1,4 @@
-import FEC.Field
+import FFEC.Field
 
 /-!
 # MontgomeryCurve model: definitions
@@ -35,6 +35,7 @@ note: `some` carries only the polynomial `Equation`; on the Weierstrass side
 inductive Point (M : MontgomeryCurve R)
   | zero
   | some (x y : R) (h : M.Equation x y)
+  deriving DecidableEq
 
 variable {R' : Type*} [CommRing R']
 

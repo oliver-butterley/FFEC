@@ -1,4 +1,4 @@
-import FEC.Edwards.Defs
+import FFEC.Edwards.Defs
 
 /-! # `addFormula_eq_add`, part 1/3 — supporting lemmas (no heavy certificates).
 Definitions + completeness + the bridge computation lemmas + cases A/B/identity/inverse.

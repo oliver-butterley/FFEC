@@ -1,4 +1,4 @@
-import FEC.Edwards.AddFormula
+import FFEC.Edwards.AddFormula
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import PrimeCert
@@ -6,7 +6,7 @@ import PrimeCert
 /-!
 # Examples: Ed25519, Curve25519, Ristretto over `𝔽 (2²⁵⁵ − 19)`
 
-These mirror the curve definitions in `curve25519-dalek-lean-verify`, but built on **FEC** — so the
+These mirror the curve definitions in `curve25519-dalek-lean-verify`, but built on **FFEC** — so the
 group structure (associativity included) comes *for free* by transport from Mathlib's Weierstrass
 group, rather than being proved directly (which dalek leaves as `sorry`, citing Hales–Raya 2020).
 
@@ -86,7 +86,7 @@ theorem edwardsD_not_square : ¬ IsSquare edwardsD := by
 theorem neg_one_is_square : IsSquare (-1 : 𝔽 p) :=
   ZMod.exists_sq_eq_neg_one_iff.mpr (by decide)
 
-/-- **Ed25519** as a complete twisted Edwards curve in FEC: `a = −1`, `d = −121665/121666`. -/
+/-- **Ed25519** as a complete twisted Edwards curve in FFEC: `a = −1`, `d = −121665/121666`. -/
 noncomputable def Ed25519 : TwistedEdwardsCurve (𝔽 p) where
   a := -1
   d := edwardsD
@@ -134,7 +134,7 @@ noncomputable def Curve25519 : MontgomeryCurve (𝔽 p) where
     norm_num
     decide
 
-/-- Curve25519 points form an `AddCommGroup` — again free via FEC's Weierstrass transport. -/
+/-- Curve25519 points form an `AddCommGroup` — again free via FFEC's Weierstrass transport. -/
 noncomputable example : AddCommGroup Curve25519.Point := inferInstance
 
 example (P Q R : Curve25519.Point) : P + Q + R = P + (Q + R) := add_assoc P Q R
@@ -149,7 +149,7 @@ example (f : 𝔽 p →+* 𝔽 p) : (Curve25519.map f).A = f 486662 := rfl
 /-! ## Ristretto (placeholder) -/
 
 /-- **Ristretto** — placeholder. The Ristretto group is the prime-order quotient of Ed25519 by its
-cofactor-8 subgroup (even points, `IsSquare (1 − y²)`); its FEC math model + encoding are deferred.
+cofactor-8 subgroup (even points, `IsSquare (1 − y²)`); its FFEC math model + encoding are deferred.
 For now this marks the underlying curve. -/
 noncomputable def Ristretto : TwistedEdwardsCurve (𝔽 p) := Ed25519
 
