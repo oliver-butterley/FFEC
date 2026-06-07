@@ -11,7 +11,7 @@ group structure (associativity included) comes *for free* by transport from Math
 group, rather than being proved directly (which dalek leaves as `sorry`, citing Hales–Raya 2020).
 
 * **Ed25519** — twisted Edwards `−x² + y² = 1 + d x² y²`, `d = −121665/121666`.
-* **Curve25519** — Montgomery `v² = u³ + A u² + u`, `A = 486662` (`B = 1`).
+* **Curve25519** — MontgomeryCurve `v² = u³ + A u² + u`, `A = 486662` (`B = 1`).
 * **Ristretto** — placeholder (the prime-order quotient; math model deferred).
 
 ## Number-theoretic facts (all proven — no axioms)
@@ -23,9 +23,8 @@ Together with the field, char ≠ 2, `−1` a square, nondegeneracy, and the **e
 this development contains **no axioms** and **no `sorry`s**.
 -/
 
-namespace FEC.Examples
+namespace Examples
 
-open FEC
 
 /-- The Curve25519 / Ed25519 base-field prime `p = 2²⁵⁵ − 19`. -/
 abbrev p : ℕ := 2 ^ 255 - 19
@@ -47,6 +46,14 @@ theorem p_prime : Nat.Prime p := prime_cert%
 instance : Fact (Nat.Prime p) := ⟨p_prime⟩
 instance : Fact (2 < p) := ⟨by norm_num [p]⟩
 
+/-- `2 ≠ 0` in `𝔽 p` (char ≠ 2) — the instance the generalized model layer expects. From `2 < p`. -/
+instance : NeZero (2 : 𝔽 p) := ⟨by
+  have hp : 2 < p := Fact.out
+  have h : ((2 : ℕ) : 𝔽 p) ≠ 0 := by
+    rw [Ne, ZMod.natCast_eq_zero_iff]
+    exact fun hdvd => absurd (Nat.le_of_dvd (by norm_num) hdvd) (by omega)
+  exact_mod_cast h⟩
+
 /-! ## Ed25519 (twisted Edwards) -/
 
 /-- The Ed25519 curve constant `d = −121665 / 121666`. -/
@@ -64,8 +71,9 @@ private theorem isSquare_div_iff_mul {F : Type*} [Field F] {a b : F} (hb : b ≠
     rw [div_mul_div_comm, ← hs, div_eq_div_iff hb (mul_ne_zero hb hb)]
     ring
 
-/-- `d` is a non-square in `𝔽 p`: the completeness condition making the Edwards addition law
-exception-free. Reduce `IsSquare (−121665/121666)` to the integer `−121665·121666 = −14802493890`
+/-- `d` is a non-square in `𝔽 p`: the completeness condition making the TwistedEdwardsCurve
+addition law exception-free. Reduce `IsSquare (−121665/121666)` to the integer
+`−121665·121666 = −14802493890`
 (non-square iff `legendreSym p = −1`), then evaluate the Legendre symbol by `norm_num` (dalek's
 pattern, `Math/Edwards/Curve.lean:56`). -/
 theorem edwardsD_not_square : ¬ IsSquare edwardsD := by
@@ -79,7 +87,7 @@ theorem neg_one_is_square : IsSquare (-1 : 𝔽 p) :=
   ZMod.exists_sq_eq_neg_one_iff.mpr (by decide)
 
 /-- **Ed25519** as a complete twisted Edwards curve in FEC: `a = −1`, `d = −121665/121666`. -/
-noncomputable def Ed25519 : Edwards (𝔽 p) where
+noncomputable def Ed25519 : TwistedEdwardsCurve (𝔽 p) where
   a := -1
   d := edwardsD
   ha := neg_one_is_square
@@ -95,17 +103,19 @@ example (P Q R : Ed25519.Point) : P + Q + R = P + (Q + R) := add_assoc P Q R
 example (P Q : Ed25519.Point) : P + Q = Q + P := add_comm P Q
 example (P : Ed25519.Point) : P + (-P) = 0 := add_neg_cancel P
 
-/-- The bridge into Mathlib's Weierstrass group (Edwards → Montgomery → Weierstrass), proven. -/
+/-- The bridge into Mathlib's Weierstrass group
+(TwistedEdwardsCurve → MontgomeryCurve → Weierstrass), proven. -/
 noncomputable example : Ed25519.Point ≃ (Ed25519.toMontgomery).toWeierstrass.toAffine.Point :=
   Ed25519.pointEquiv
 
-/-! ## Curve25519 (Montgomery) -/
+/-! ## Curve25519 (MontgomeryCurve) -/
 
 /-- **Curve25519** Montgomery curve `v² = u³ + 486662 u² + u` (`A = 486662`, `B = 1`). -/
-noncomputable def Curve25519 : Montgomery (𝔽 p) where
+noncomputable def Curve25519 : MontgomeryCurve (𝔽 p) where
   A := 486662
   B := 1
   nondegen := by
+    rw [isUnit_iff_ne_zero]
     norm_num
     decide
 
@@ -119,6 +129,6 @@ example (P Q R : Curve25519.Point) : P + Q + R = P + (Q + R) := add_assoc P Q R
 /-- **Ristretto** — placeholder. The Ristretto group is the prime-order quotient of Ed25519 by its
 cofactor-8 subgroup (even points, `IsSquare (1 − y²)`); its FEC math model + encoding are deferred.
 For now this marks the underlying curve. -/
-noncomputable def Ristretto : Edwards (𝔽 p) := Ed25519
+noncomputable def Ristretto : TwistedEdwardsCurve (𝔽 p) := Ed25519
 
-end FEC.Examples
+end Examples

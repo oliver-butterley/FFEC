@@ -9,11 +9,10 @@ coordinate ring, i.e. `Pic⁰`). We *consume* it: given a bijection from a model
 group, the entire `AddCommGroup` transports with **no axiom re-proved**, via `Equiv.addCommGroup`.
 
 Two models of the same curve, both transferring to the same reference group, are then canonically
-isomorphic (`crossEquiv`). The intrinsic `ι`/`Pic⁰` *uniqueness* characterization lives at the curve
-layer (`FEC.Curve`), where the canonical group is available.
+isomorphic (`crossEquiv`); when they transfer to the *same* group, the transported point groups are
+canonically additively isomorphic (`crossAddEquiv`), with no addition-formula reasoning.
 -/
 
-namespace FEC
 
 universe u v
 
@@ -46,4 +45,3 @@ noncomputable def GroupTransfer.crossAddEquiv (t : GroupTransfer Pt G) (t' : Gro
   letI := Equiv.add t'.equiv
   (t.equiv.addEquiv).trans (t'.equiv.addEquiv).symm
 
-end FEC

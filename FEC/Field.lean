@@ -8,7 +8,6 @@ Per the project's "relative over a ring `R`, group over fields" decision, most *
 stated over an arbitrary `[CommRing R]`; the *point group* specializes to `𝔽 p` (a field).
 -/
 
-namespace FEC
 
 /-- The finite field `𝔽 p = ZMod p` for a prime `p`. -/
 abbrev 𝔽 (p : ℕ) [Fact p.Prime] := ZMod p
@@ -17,4 +16,3 @@ abbrev 𝔽 (p : ℕ) [Fact p.Prime] := ZMod p
 example (p : ℕ) [Fact p.Prime] : Field (𝔽 p) := inferInstance
 example (p : ℕ) [Fact p.Prime] : DecidableEq (𝔽 p) := inferInstance
 
-end FEC

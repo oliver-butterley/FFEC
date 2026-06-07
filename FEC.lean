@@ -2,8 +2,6 @@
 -- with the group reused from Mathlib's Weierstrass curve via the transfer theorem.
 import FEC.Field
 import FEC.Framework
-import FEC.Curve
-import FEC.Weierstrass.Basic
 import FEC.Montgomery.Defs
 import FEC.Montgomery.ToWeierstrass
 import FEC.Montgomery.Equiv
