@@ -1,0 +1,10 @@
+{
+  "editor.rulers": [100],
+  "editor.wordWrapColumn": 100,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[lean4]": {
+    "editor.wordWrap": "off",
+    "editor.rulers": [100]
+  }
+}
