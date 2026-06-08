@@ -28,8 +28,8 @@ this by transporting its points into `E.Point` (or bridging to it).
     `linear_combination` with Singular-computed cofactors that `ring` re-checks.
 
 ## Also in this file
-* The **payoff** `addFormula_assoc`/`addFormula_comm`, and the **coordinate group API**
-  (`@[simp]` lemmas `add_mk`/`neg_mk`/`zero_def` and the bridge `pointAddEquiv : E.Point ≃+ W.Point`).
+* The **payoff** `addFormula_assoc`/`addFormula_comm`, and the **coordinate group API** (`@[simp]`
+  lemmas `add_mk`/`neg_mk`/`zero_def` and the bridge `pointAddEquiv : E.Point ≃+ W.Point`).
 * A **computable model** of scalar multiplication: `nsmulFormula` (iterated `addFormula`, computable
   since `addFormula` is pure field arithmetic) with `nsmulFormula_eq : nsmulFormula n P = n • P`,
   letting one `decide`/`native_decide` torsion and transfer it to the abstract group. See

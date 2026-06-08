@@ -7,8 +7,8 @@ import FFEC.Framework
 Builds on `Equiv.lean` (the bijection `pointEquiv`) and `Framework.lean` (the transfer theorem).
 
 * The `AddCommGroup M.Point` instance is obtained by **transporting** Mathlib's Weierstrass group
-  along `pointEquiv` — NO group axioms are re-proved (the transfer theorem in action). `pointAddEquiv`
-  packages the bridge as an additive equivalence (a group isomorphism, free by construction).
+  along `pointEquiv` — NO group axioms are re-proved (the transfer theorem in action).
+  `pointAddEquiv` packages the bridge as an additive equivalence (a group isomorphism, free).
 * The **explicit group law in coordinates**: `zero_def` (identity = `∞`), `neg_some` (`(x, −y)`),
   `add_some` (chord, `x₃ = B λ² − A − x₁ − x₂`), `double` (tangent) — each proven through the bridge
   + `field_simp`/`ring` (no certificates; the Weierstrass slope of the scaled points is `B·λ`).
