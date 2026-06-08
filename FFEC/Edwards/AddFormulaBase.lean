@@ -14,7 +14,7 @@ namespace TwistedEdwardsCurve
 /-- The explicit complete twisted-Edwards addition on coordinates — the formula an implementation
 uses directly (cf. curve25519-dalek's `add_coords`):
 `(x₁,y₁) + (x₂,y₂) = ((x₁y₂+y₁x₂)/(1+d·x₁x₂y₁y₂), (y₁y₂−a·x₁x₂)/(1−d·x₁x₂y₁y₂))`. -/
-noncomputable def addCoords (E : TwistedEdwardsCurve F) (x₁ y₁ x₂ y₂ : F) : F × F :=
+def addCoords (E : TwistedEdwardsCurve F) (x₁ y₁ x₂ y₂ : F) : F × F :=
   ((x₁ * y₂ + y₁ * x₂) / (1 + E.d * x₁ * x₂ * y₁ * y₂),
    (y₁ * y₂ - E.a * x₁ * x₂) / (1 - E.d * x₁ * x₂ * y₁ * y₂))
 
@@ -82,7 +82,7 @@ theorem addCoords_onCurve (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
 
 /-- The explicit TwistedEdwardsCurve addition as an operation on points
 (an implementation's `add`). -/
-noncomputable def addFormula (E : TwistedEdwardsCurve F) : E.Point → E.Point → E.Point
+def addFormula (E : TwistedEdwardsCurve F) : E.Point → E.Point → E.Point
   | .mk x₁ y₁ h1, .mk x₂ y₂ h2 =>
       .mk (E.addCoords x₁ y₁ x₂ y₂).1 (E.addCoords x₁ y₁ x₂ y₂).2 (E.addCoords_onCurve h1 h2)
 

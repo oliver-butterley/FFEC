@@ -146,6 +146,36 @@ example : (0 : Curve25519.Point) = .zero := by simp
 -- Base change is available (mirrors `WeierstrassCurve.map`): reduce Curve25519 along any ring hom.
 example (f : 𝔽 p →+* 𝔽 p) : (Curve25519.map f).A = f 486662 := rfl
 
+/-! ### Quadratic-character facts for Curve25519 (Montgomery model, `A = 486662`)
+
+These are the curve25519-dalek completeness inputs (`non_IsQuase`, `A_minus_two_non_square`,
+`A_plus_two_square`): `A² − 4` and `A − 2` are non-squares, `A + 2` is a square, in `𝔽 (2²⁵⁵−19)`.
+Each reduces `Curve25519.A` to its numeral (`= 486662`, by `rfl`), `ring_nf`s to an integer
+numeral, then evaluates the Legendre symbol by `norm_num`. -/
+
+/-- `A² − 4 = 236839902240` is a non-square in `𝔽 p` (`legendreSym p = −1`). This is the
+`x² + Ax + 1` discriminant: its non-squareness rules out `2`-torsion off the origin. -/
+theorem Curve25519.A_sq_sub_four_not_square : ¬ IsSquare (Curve25519.A ^ 2 - 4 : 𝔽 p) := by
+  change ¬ IsSquare ((486662 : 𝔽 p) ^ 2 - 4)
+  rw [show ((486662 : 𝔽 p) ^ 2 - 4) = ((236839902240 : ℤ) : 𝔽 p) by push_cast; ring]
+  exact (@legendreSym.eq_neg_one_iff p _ 236839902240).mp (by norm_num [p])
+
+/-- `A − 2 = 486660` is a non-square in `𝔽 p` (`legendreSym p = −1`). -/
+theorem Curve25519.A_sub_two_not_square : ¬ IsSquare (Curve25519.A - 2 : 𝔽 p) := by
+  change ¬ IsSquare ((486662 : 𝔽 p) - 2)
+  rw [show ((486662 : 𝔽 p) - 2) = ((486660 : ℤ) : 𝔽 p) by push_cast; ring]
+  exact (@legendreSym.eq_neg_one_iff p _ 486660).mp (by norm_num [p])
+
+/-- `A + 2 = 486664` is a square in `𝔽 p` (`legendreSym p = 1`). -/
+theorem Curve25519.A_add_two_square : IsSquare (Curve25519.A + 2 : 𝔽 p) := by
+  change IsSquare ((486662 : 𝔽 p) + 2)
+  rw [show ((486662 : 𝔽 p) + 2) = ((486664 : ℤ) : 𝔽 p) by push_cast; ring]
+  have hne : ((486664 : ℤ) : 𝔽 p) ≠ 0 := by
+    rw [show ((486664 : ℤ) : 𝔽 p) = ((486664 : ℕ) : 𝔽 p) by push_cast; ring, Ne,
+      ZMod.natCast_eq_zero_iff]
+    exact fun hdvd => absurd (Nat.le_of_dvd (by norm_num) hdvd) (by norm_num [p])
+  exact ((@legendreSym.eq_one_iff p _ 486664) hne).mp (by norm_num [p])
+
 /-! ## Ristretto (placeholder) -/
 
 /-- **Ristretto** — placeholder. The Ristretto group is the prime-order quotient of Ed25519 by its

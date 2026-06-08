@@ -222,6 +222,75 @@ theorem double (M : MontgomeryCurve F) {x y : F} (h : M.Equation x y) (hy : y �
       WeierstrassCurve.Affine.addX, MontgomeryCurve.toWeierstrass]
     field_simp; ring
 
+omit [DecidableEq F] [NeZero (2 : F)] in
+/-- The `x`-coordinate (`u`-coordinate) accessor for Montgomery points: `0` at infinity. -/
+def xCoord (M : MontgomeryCurve F) : M.Point → F
+  | .zero => 0
+  | .some x _ _ => x
+
+omit [DecidableEq F] [NeZero (2 : F)] in
+@[simp] theorem xCoord_some (M : MontgomeryCurve F) {x y : F} (h : M.Equation x y) :
+    M.xCoord (.some x y h) = x := rfl
+
+/-- **Montgomery x-only ("ladder") differential addition identity** (`uADD`).
+For `P = some x₁ y₁ h₁`, `Q = some x₂ y₂ h₂` with `x₁ ≠ x₂`, the `x`-coordinates of `P + Q` and
+`P − Q` satisfy the symmetric relation
+`xCoord(P+Q) · xCoord(P−Q) · (x₁ − x₂)² = (x₁·x₂ − 1)²`.
+(For `B = 1` this is curve25519-dalek's `uADD`. The algebra dictates **no** factor of `B`: the
+result `xCoord` carries an explicit `B`, but `B·λ²` collapses against `B·yᵢ² = …` so the clean
+true identity is `B`-free for every `B`.) -/
+theorem uADD (M : MontgomeryCurve F) {x₁ y₁ x₂ y₂ : F}
+    (h₁ : M.Equation x₁ y₁) (h₂ : M.Equation x₂ y₂) (hx : x₁ ≠ x₂) :
+    M.xCoord ((MontgomeryCurve.Point.some x₁ y₁ h₁)
+        + (MontgomeryCurve.Point.some x₂ y₂ h₂))
+      * M.xCoord ((MontgomeryCurve.Point.some x₁ y₁ h₁)
+        - (MontgomeryCurve.Point.some x₂ y₂ h₂))
+      * (x₁ - x₂) ^ 2 = (x₁ * x₂ - 1) ^ 2 := by
+  have hB := M.B_ne_zero
+  have hd : x₂ - x₁ ≠ 0 := sub_ne_zero.mpr (Ne.symm hx)
+  -- `P − Q = P + (−Q)` and `−Q = some x₂ (−y₂)`; the chord hyp `x₁ ≠ x₂` holds for both sums.
+  have hsub : (MontgomeryCurve.Point.some x₁ y₁ h₁) - (MontgomeryCurve.Point.some x₂ y₂ h₂)
+      = (MontgomeryCurve.Point.some x₁ y₁ h₁)
+        + (MontgomeryCurve.Point.some x₂ (-y₂) (by rw [Equation] at h₂ ⊢; linear_combination h₂)) :=
+    by rw [sub_eq_add_neg, M.neg_some h₂]
+  rw [M.add_some h₁ h₂ hx, hsub, M.add_some h₁ _ hx]
+  simp only [xCoord]
+  -- Substitute the curve equations `B·yᵢ² = xᵢ³ + A·xᵢ² + xᵢ` (clears all `B`/`y` dependence).
+  rw [Equation] at h₁ h₂
+  field_simp
+  linear_combination
+    ((x₁ - x₂) ^ 2 * (-(x₂ ^ 3 + M.A * x₂ ^ 2 + x₂) + (x₁ ^ 3 + M.A * x₁ ^ 2 + x₁)
+        - (M.B * y₂ ^ 2 - M.B * y₁ ^ 2) - 2 * ((x₂ - x₁) ^ 2 * (M.A + x₁ + x₂)))) * h₁
+      + ((x₁ - x₂) ^ 2 * ((x₂ ^ 3 + M.A * x₂ ^ 2 + x₂) - (x₁ ^ 3 + M.A * x₁ ^ 2 + x₁)
+        + (M.B * y₂ ^ 2 - M.B * y₁ ^ 2) - 2 * ((x₂ - x₁) ^ 2 * (M.A + x₁ + x₂)))) * h₂
+
+/-- **Montgomery x-only ("ladder") differential doubling identity** (`uDBL`).
+For `P = some x y h` with `y ≠ 0`, the `x`-coordinate of `P + P` (the `double` law) relates to `x`:
+`4 · xCoord(2•P) · x · (x² + A·x + 1) = (x² − 1)²`.
+(For `B = 1` this is curve25519-dalek's `uDBL`; the algebra dictates **no** factor of `B`.) -/
+theorem uDBL (M : MontgomeryCurve F) {x y : F} (h : M.Equation x y) (hy : y ≠ 0) :
+    4 * M.xCoord ((MontgomeryCurve.Point.some x y h) + (MontgomeryCurve.Point.some x y h))
+      * x * (x ^ 2 + M.A * x + 1) = (x ^ 2 - 1) ^ 2 := by
+  have hB := M.B_ne_zero
+  rw [M.double h hy]
+  simp only [xCoord]
+  rw [Equation] at h
+  field_simp
+  linear_combination (-4 * x * (x * (x + M.A) + 1) * (4 * M.A + 8 * x) - 4 * (x ^ 2 - 1) ^ 2) * h
+
+-- The x-only differential identities, exercised on arbitrary affine points.
+example (M : MontgomeryCurve F) {x₁ y₁ x₂ y₂ : F}
+    (h₁ : M.Equation x₁ y₁) (h₂ : M.Equation x₂ y₂) (hx : x₁ ≠ x₂) :
+    M.xCoord ((MontgomeryCurve.Point.some x₁ y₁ h₁) + (MontgomeryCurve.Point.some x₂ y₂ h₂))
+        * M.xCoord ((MontgomeryCurve.Point.some x₁ y₁ h₁) - (MontgomeryCurve.Point.some x₂ y₂ h₂))
+        * (x₁ - x₂) ^ 2 = (x₁ * x₂ - 1) ^ 2 :=
+  M.uADD h₁ h₂ hx
+
+example (M : MontgomeryCurve F) {x y : F} (h : M.Equation x y) (hy : y ≠ 0) :
+    4 * M.xCoord ((MontgomeryCurve.Point.some x y h) + (MontgomeryCurve.Point.some x y h))
+        * x * (x ^ 2 + M.A * x + 1) = (x ^ 2 - 1) ^ 2 :=
+  M.uDBL h hy
+
 -- Architectural stress tests: the explicit laws compose with the group structure.
 example (M : MontgomeryCurve F) (P : M.Point) : P + (-P) = 0 := add_neg_cancel P
 

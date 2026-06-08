@@ -74,22 +74,6 @@ theorem addFormula_eq_add (E : TwistedEdwardsCurve F) (P Q : E.Point) :
       map_add (Equiv.addEquiv E.pointEquiv) P Q]
   exact E.pointEquiv_addFormula P Q
 
-/- TODO (computable group / decidable torsion) — deferred; see `notes/future-work.md` §2.
-   The `AddCommGroup E.Point` instance is *noncomputable*: it is transported via `pointEquiv`
-   (Edwards → Montgomery → Weierstrass) and Mathlib's Weierstrass group, whose law is built from the
-   class group of the coordinate ring (using `Classical`). But `addFormula` is the *explicit*
-   coordinate addition (pure field arithmetic), and `addFormula_eq_add` proves it equals that group
-   `+`; with `addFormula_assoc`/`addFormula_comm` + `addCoords_zero_left/right` + `addCoords_inv` we
-   have ALL the group axioms about `addFormula`. So one can either (1) make `addFormula` the
-   instance's `add` (proving the axioms by transport, inside the proofs) — one instance that
-   *computes wherever the field does* — or (2) keep this instance and add a parallel computable
-   `nsmulFormula n P` (iterate `addFormula`), prove `nsmulFormula n P = n • P`, and `native_decide`
-   torsion on it, transferring via the agreement. Either way this yields dalek-style `native_decide`
-   torsion WITH our proven associativity. The genuine constraint: it only *computes* over a
-   *computable* field (`ZMod p`); an abstract `[Field F]` has a possibly-noncomputable inverse
-   (e.g. `ℝ`). `addFormula` is currently tagged `noncomputable` but is pure field arithmetic, so
-   over `ZMod p` that tag should be removable (or a thin computable restatement suffices). -/
-
 -- `DecidableEq F` is used in the proof (Mathlib's point group) though not in this statement's type.
 set_option linter.unusedDecidableInType false in
 /-- **Payoff**: the explicit twisted-Edwards addition is associative — derived for free from
@@ -139,6 +123,35 @@ noncomputable def pointAddEquiv (E : TwistedEdwardsCurve F) :
       = .mk (E.addCoords x₁ y₁ x₂ y₂).1 (E.addCoords x₁ y₁ x₂ y₂).2
           (E.addCoords_onCurve h₁ h₂) := by
   rw [← addFormula_eq_add]; rfl
+
+/-! ## A computable model of the group operations
+
+The `AddCommGroup E.Point` instance is *noncomputable* (transported via `pointEquiv` through
+Mathlib's Weierstrass group, whose law is built from the class group of the coordinate ring, using
+`Classical`). But `addFormula` is the *explicit* coordinate addition — pure field arithmetic, hence
+**computable** (over any computable field, e.g. `ZMod p`) — and `addFormula_eq_add` proves it equals
+the group `+`. `nsmulFormula` iterates it to a computable model of scalar multiplication, and
+`nsmulFormula_eq` proves it equals `n • P`. This is the "computable version via the explicit
+formula, proven consistent" upgrade (see `notes/future-work.md` §2): it lets one *compute* group
+powers and settle torsion — by `decide` (kernel, axiom-free) for small cases, or `native_decide`
+for the Ed25519 cofactor (fast, but adds the `Lean.ofReduceBool` compiler-trust axiom, as dalek
+does) — and transfer to the abstract `n • P` via `nsmulFormula_eq`. (Further step, not taken: make
+`addFormula` the instance's `add` directly, proving the axioms by transport — one instance that
+computes wherever the field does.) -/
+
+omit [DecidableEq F] in
+/-- Computable iterated addition via the explicit formula `addFormula` — a computable model of
+scalar multiplication (`nsmulFormula 0 = (0,1)`, `nsmulFormula (n+1) P = nsmulFormula n P + P`). -/
+def nsmulFormula (E : TwistedEdwardsCurve F) : ℕ → E.Point → E.Point
+  | 0,     _ => .mk 0 1 (by rw [TwistedEdwardsCurve.Equation]; ring)
+  | (n+1), P => E.addFormula (E.nsmulFormula n P) P
+
+/-- The computable model agrees with the (noncomputable) group scalar multiplication `n • P`. -/
+theorem nsmulFormula_eq (E : TwistedEdwardsCurve F) (n : ℕ) (P : E.Point) :
+    E.nsmulFormula n P = n • P := by
+  induction n with
+  | zero => rw [zero_nsmul]; exact (E.zero_def).symm
+  | succ n ih => rw [succ_nsmul, ← ih, ← addFormula_eq_add]; rfl
 
 /-- The bridge to Mathlib's Weierstrass group is injective (already proven, no `sorry`). -/
 example (E : TwistedEdwardsCurve F) : Function.Injective E.pointEquiv := E.pointEquiv.injective
