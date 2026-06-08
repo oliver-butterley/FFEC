@@ -11,6 +11,9 @@ group, the entire `AddCommGroup` transports with **no axiom re-proved**, via `Eq
 Two models of the same curve, both transferring to the same reference group, are then canonically
 isomorphic (`crossEquiv`); when they transfer to the *same* group, the transported point groups are
 canonically additively isomorphic (`crossAddEquiv`), with no addition-formula reasoning.
+
+Imports only `FFEC.Field`. Consumed by `FFEC.Montgomery.Group` (the Montgomery point group) and
+`FFEC.Edwards.Defs` (the twisted-Edwards group + its free cross-model `≃+` to its Montgomery curve).
 -/
 
 

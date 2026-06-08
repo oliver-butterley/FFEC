@@ -2,10 +2,18 @@ import FFEC.Montgomery.Equiv
 import FFEC.Framework
 
 /-!
-# MontgomeryCurve point group (transported)
+# MontgomeryCurve point group, explicit law, and X25519 ladder identities
 
-The MontgomeryCurve point group is obtained by transporting Mathlib's Weierstrass group along the
-canonical `pointEquiv`. NO group axioms are re-proved — this is the transfer theorem in action.
+Builds on `Equiv.lean` (the bijection `pointEquiv`) and `Framework.lean` (the transfer theorem).
+
+* The `AddCommGroup M.Point` instance is obtained by **transporting** Mathlib's Weierstrass group
+  along `pointEquiv` — NO group axioms are re-proved (the transfer theorem in action). `pointAddEquiv`
+  packages the bridge as an additive equivalence (a group isomorphism, free by construction).
+* The **explicit group law in coordinates**: `zero_def` (identity = `∞`), `neg_some` (`(x, −y)`),
+  `add_some` (chord, `x₃ = B λ² − A − x₁ − x₂`), `double` (tangent) — each proven through the bridge
+  + `field_simp`/`ring` (no certificates; the Weierstrass slope of the scaled points is `B·λ`).
+* The **x-only differential identities** `uADD`/`uDBL` (with the `xCoord` accessor) that the X25519
+  Montgomery ladder is verified against — and which turn out to be independent of `B`.
 -/
 
 

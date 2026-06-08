@@ -19,6 +19,8 @@ The two certificate-level facts about `𝔽 (2²⁵⁵−19)` are both proven he
 * **primality** of `2²⁵⁵−19` — `p_prime`, via a Pratt/Pocklington certificate checked by the
   `PrimeCert` dependency's `prime_cert%` elaborator;
 * `d` is a **non-square** — `edwardsD_not_square`, via a Legendre-symbol computation (`norm_num`).
+Likewise the Curve25519 quadratic-character facts used by the birational/Ristretto theory —
+`Curve25519.A_sq_sub_four_not_square`, `A_sub_two_not_square` (non-squares) and `A_add_two_square`.
 Together with the field, char ≠ 2, `−1` a square, nondegeneracy, and the **entire group structure**,
 this development contains **no axioms** and **no `sorry`s**.
 -/

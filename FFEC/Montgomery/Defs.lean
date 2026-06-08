@@ -4,7 +4,12 @@ import FFEC.Field
 # MontgomeryCurve model: definitions
 
 A Montgomery curve `B y² = x³ + A x² + x` with nondegeneracy `IsUnit (B (A² − 4))`. Defined over an
-arbitrary `[CommRing R]` (params and equation); the point group specializes to `𝔽 p` later.
+arbitrary `[CommRing R]` (the structure, `Equation`, `Point`, and base change `map`); the point
+group specializes to a field later.
+
+The basis of the Montgomery chain: `ToWeierstrass` (the Weierstrass embedding, `Δ`, `IsElliptic`,
+`j`), `Equiv` (the point bijection to Weierstrass), and `Group` (the transported group + explicit
+law) all build on this file. `Edwards.Defs` also targets it via the birational `toMontgomery`.
 -/
 
 
