@@ -17,7 +17,214 @@ omit [DecidableEq F] [NeZero (2 : F)] in
 theorem toMontV_eq_toMontU_div (x y : F) : toMontV x y = toMontU y / x := by
   unfold toMontV toMontU; rw [div_div]
 
-set_option linter.style.longLine false in -- Singular cofactor certs below are single long lines
+/-! ### Singular cofactor certificates
+
+Each lemma below states verbatim the polynomial identity left after `field_simp` at the
+corresponding `linear_combination` site in `generic_addX`/`generic_addY`/`generic_addY_secant`,
+and discharges it with the externally-computed (Singular `lift`) cofactor, re-checked by `ring`
+inside `linear_combination`. Isolating them as standalone polynomial identities keeps the main
+proofs as clean dispatch and concentrates the heavy compilation here. The hypotheses are the
+curve equations in their `TwistedEdwardsCurve.Equation`-rewritten form. -/
+
+omit [DecidableEq F] [NeZero (2 : F)] in
+/-- Cofactor certificate for the **doubling** branch of `generic_addX` (one point after `subst`). -/
+private theorem cert_addX_double (E : TwistedEdwardsCurve F) {x₁ y₁ : F}
+    (h1 : E.a * x₁ ^ 2 + y₁ ^ 2 = 1 + E.d * x₁ ^ 2 * y₁ ^ 2) :
+    4 * (E.a - E.d) * (1 - E.d * y₁ ^ 2 * x₁ ^ 2 + (y₁ ^ 2 - E.a * x₁ ^ 2)) * (1 + y₁) ^ 2 * (1 -
+        y₁) ^ 2 * (1 - -1) ^ 2 =
+    (1 - E.d * y₁ ^ 2 * x₁ ^ 2 - (y₁ ^ 2 - E.a * x₁ ^ 2)) *
+      (x₁ ^ 2 *
+              ((1 + y₁) * ((E.a - E.d) * 3 * (1 + y₁) + (1 - y₁) * 2 ^ 2 * (E.a + E.d)) + (E.a -
+                  E.d) * (1 - y₁) ^ 2) ^
+                2 -
+            4 * (1 + y₁) ^ 2 * (1 - y₁) ^ 2 * 2 * (E.a + E.d) * (1 - -1) ^ 2 -
+          4 * (E.a - E.d) * (1 + y₁) ^ 3 * (1 - y₁) * (1 - -1) ^ 2 -
+        4 * (E.a - E.d) * (1 + y₁) ^ 3 * (1 - y₁) * (1 - -1) ^ 2) := by
+  linear_combination
+      (-64*E.d^2*x₁^2*y₁^4+64*E.a*E.d*x₁^2*y₁^3-64*E.d^2*x₁^2*y₁^3-16*E.a^2*x₁^2*y₁^2
+      +160*E.a*E.d*x₁^2*y₁^2-16*E.d^2*x₁^2*y₁^2-64*E.a^2*x₁^2*y₁+64*E.a*E.d*x₁^2*y₁+16*E.a*y₁^4
+      -80*E.d*y₁^4-64*E.a^2*x₁^2+64*E.a*y₁^3-64*E.d*y₁^3+64*E.a*y₁^2+64*E.d*y₁^2-64*E.a*y₁+64*E.d*y₁
+      -80*E.a+16*E.d) * h1
+
+omit [DecidableEq F] [NeZero (2 : F)] in
+/-- Cofactor certificate for the **secant** branch of `generic_addX`. -/
+private theorem cert_addX_secant (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
+    (h1 : E.a * x₁ ^ 2 + y₁ ^ 2 = 1 + E.d * x₁ ^ 2 * y₁ ^ 2)
+    (h2 : E.a * x₂ ^ 2 + y₂ ^ 2 = 1 + E.d * x₂ ^ 2 * y₂ ^ 2) :
+    4 * (E.a - E.d) * x₁ ^ 2 * x₂ ^ 2 * (1 - E.d * y₁ * y₂ * x₁ * x₂ + (y₁ * y₂ - E.a * x₁ * x₂)) *
+        (1 - y₁) * (1 - y₂) *
+      ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 2 =
+    4 * (1 - E.d * y₁ * y₂ * x₁ * x₂ - (y₁ * y₂ - E.a * x₁ * x₂)) *
+      ((1 - y₂) *
+          ((1 - y₁) *
+              ((x₂ * (1 + y₁) * (1 - y₂) - x₁ * (1 - y₁) * (1 + y₂)) *
+                  (4 * (x₂ * (1 + y₁) * (1 - y₂) - x₁ * (1 - y₁) * (1 + y₂)) +
+                    (E.a - E.d) * x₁ * x₂ * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) * 0) -
+                x₁ ^ 2 * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 2 * 2 * (E.a + E.d))
+                    -
+            (E.a - E.d) * x₁ ^ 2 * x₂ ^ 2 * (1 + y₁) * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^
+                2) -
+        (E.a - E.d) * x₁ ^ 2 * x₂ ^ 2 * (1 - y₁) * (1 + y₂) * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 +
+            y₂)) ^ 2) := by
+  linear_combination
+        (16*E.a*x₁*y₁^2*x₂^3*y₂^2-16*E.a*x₁*y₁*x₂^3*y₂^3-48*E.a*x₁*y₁^2*x₂^3*y₂
+        -16*E.d*x₁*y₁^2*x₂^3*y₂+64*E.a*x₁*y₁*x₂^3*y₂^2-16*E.a*x₁*x₂^3*y₂^3-16*x₁*y₁^2*x₂*y₂^4
+        +16*y₁^2*x₂^2*y₂^4+48*E.a*x₁*y₁^2*x₂^3-96*E.a*x₁*y₁*x₂^3*y₂-16*E.d*x₁*y₁*x₂^3*y₂
+        +48*E.a*x₁*x₂^3*y₂^2-16*x₁*y₁^2*x₂*y₂^3-48*y₁^2*x₂^2*y₂^3+48*x₁*y₁*x₂*y₂^4+16*y₁*x₂^2*y₂^4
+        +64*E.a*x₁*y₁*x₂^3-48*E.a*x₁*x₂^3*y₂+64*x₁*y₁^2*x₂*y₂^2+48*y₁^2*x₂^2*y₂^2-48*x₁*y₁*x₂*y₂^3
+        -64*y₁*x₂^2*y₂^3+16*E.a*x₁*x₂^3+16*x₁*y₁^2*x₂*y₂-16*y₁^2*x₂^2*y₂-32*x₁*y₁*x₂*y₂^2
+        +96*y₁*x₂^2*y₂^2-32*x₁*x₂*y₂^3-16*x₂^2*y₂^3-48*x₁*y₁^2*x₂+48*x₁*y₁*x₂*y₂-64*y₁*x₂^2*y₂
+        +32*x₁*x₂*y₂^2+48*x₂^2*y₂^2-16*x₁*y₁*x₂+16*y₁*x₂^2+32*x₁*x₂*y₂-48*x₂^2*y₂-32*x₁*x₂+16*x₂^2)
+        * h1 +
+        (48*E.d*x₁^3*y₁^4*x₂-16*E.a*x₁^3*y₁^3*x₂*y₂-96*E.d*x₁^3*y₁^3*x₂*y₂+16*E.a*x₁^3*y₁^2*x₂*y₂^2
+        +48*E.d*x₁^3*y₁^2*x₂*y₂^2-16*E.a*x₁^3*y₁^3*x₂+16*E.d*x₁^3*y₁^3*x₂+64*E.a*x₁^3*y₁^2*x₂*y₂
+        +16*E.d*x₁^3*y₁^2*x₂*y₂+16*x₁^2*y₁^4*y₂^2-48*E.a*x₁^3*y₁*x₂*y₂^2-16*E.d*x₁^3*y₁*x₂*y₂^2
+        -16*x₁*y₁^4*x₂*y₂^2+32*E.d*x₁^3*y₁^2*x₂+16*x₁^2*y₁^4*y₂-16*E.d*x₁^3*y₁*x₂*y₂
+        +48*x₁*y₁^4*x₂*y₂-48*x₁^2*y₁^3*y₂^2-16*x₁*y₁^3*x₂*y₂^2-64*E.a*x₁^3*y₁*x₂-48*x₁*y₁^4*x₂
+        -64*x₁^2*y₁^3*y₂+48*E.a*x₁^3*x₂*y₂+48*x₁*y₁^3*x₂*y₂+48*x₁^2*y₁^2*y₂^2+16*x₁*y₁^2*x₂*y₂^2
+        -16*x₁^2*y₁^3-16*E.a*x₁^3*x₂-48*x₁*y₁^3*x₂+96*x₁^2*y₁^2*y₂-48*x₁*y₁^2*x₂*y₂-16*x₁^2*y₁*y₂^2
+        +16*x₁*y₁*x₂*y₂^2+48*x₁^2*y₁^2+48*x₁*y₁^2*x₂-64*x₁^2*y₁*y₂-48*x₁*y₁*x₂*y₂-48*x₁^2*y₁
+        +48*x₁*y₁*x₂+16*x₁^2*y₂+16*x₁^2) * h2
+
+omit [DecidableEq F] [NeZero (2 : F)] in
+/-- Cofactor certificate for the `hY2` step (`sum = (0,-1)` leaf) of `generic_addY_secant`. -/
+private theorem cert_secant_negY (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
+    (h1 : E.a * x₁ ^ 2 + y₁ ^ 2 = 1 + E.d * x₁ ^ 2 * y₁ ^ 2)
+    (h2 : E.a * x₂ ^ 2 + y₂ ^ 2 = 1 + E.d * x₂ ^ 2 * y₂ ^ 2)
+    (hsX : x₁ * y₂ + y₁ * x₂ = 0)
+    (gsY : y₁ * y₂ - E.a * x₁ * x₂ + 1 - E.d * x₁ * x₂ * y₁ * y₂ = 0) :
+    (y₁ + y₂) * ((E.d * x₁ * x₂ * y₁ * y₂) ^ 2 - 1) = 0 := by
+  linear_combination (-E.d*x₁*x₂*y₂^3-E.d*x₂^2*y₂^3+E.a*x₂^2*y₂+y₂^3+y₂) * h1 +
+      (-E.d*x₁^2*y₁^2*y₂+E.d*x₁^2*y₁*y₂^2+y₂) * h2 +
+      (E.d^2*x₁^2*y₁^2*x₂*y₂^2+2*E.a*E.d*x₁^2*y₁*x₂*y₂+E.a*E.d*x₁^2*x₂*y₂^2-E.d*x₁*y₁*y₂^3
+      +E.d*y₁*x₂*y₂^3-E.d*x₁*y₁*y₂-E.a*y₁*x₂*y₂-E.a*x₁*y₂^2-E.a*x₁) * hsX +
+      (2*E.d*x₁^2*y₁*y₂^2+E.d*x₁*y₁*x₂*y₂^2-E.d*x₁*x₂*y₂^3+E.a*x₁*x₂*y₂-y₁*y₂^2-y₁+y₂) * gsY
+
+omit [DecidableEq F] [NeZero (2 : F)] in
+/-- Cofactor certificate for the `sumX ≠ 0` branch of `generic_addY_secant`. -/
+private theorem cert_addY_secant (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
+    (h1 : E.a * x₁ ^ 2 + y₁ ^ 2 = 1 + E.d * x₁ ^ 2 * y₁ ^ 2)
+    (h2 : E.a * x₂ ^ 2 + y₂ ^ 2 = 1 + E.d * x₂ ^ 2 * y₂ ^ 2) :
+    4 ^ 2 * x₁ * x₂ * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) *
+        ((1 - y₂) *
+            ((1 - y₁) *
+                (((1 + y₁) * (1 - y₂) * x₂ - (1 - y₁) * x₁ * (1 + y₂)) *
+                    (4 * ((1 + y₁) * (1 - y₂) * x₂ - (1 - y₁) * x₁ * (1 + y₂)) +
+                      (E.a - E.d) * x₁ * x₂ * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) * 0) -
+                  x₁ ^ 2 * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 2 * 2 * (E.a +
+                      E.d)) -
+              (E.a - E.d) * (1 + y₁) * x₁ ^ 2 * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂))
+                  ^ 2) -
+          (E.a - E.d) * (1 - y₁) * x₁ ^ 2 * (1 + y₂) * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1
+              + y₂)) ^ 2) *
+      (1 + E.d * y₁ * x₁ * y₂ * x₂) =
+    (4 *
+          (-(4 *
+                (((1 + y₁) * (1 - y₂) * x₂ - (1 - y₁) * x₁ * (1 + y₂)) *
+                    ((1 - y₂) *
+                          ((1 - y₁) *
+                              (((1 + y₁) * (1 - y₂) * x₂ - (1 - y₁) * x₁ * (1 + y₂)) *
+                                  (4 * ((1 + y₁) * (1 - y₂) * x₂ - (1 - y₁) * x₁ * (1 + y₂)) +
+                                    (E.a - E.d) * x₁ * x₂ * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 +
+                                        y₂)) * 0) -
+                                x₁ ^ 2 * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 2 *
+                                    2 * (E.a + E.d)) -
+                            (E.a - E.d) * (1 + y₁) * x₁ ^ 2 * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 -
+                                y₁) * (1 + y₂)) ^ 2) -
+                        (E.a - E.d) * (1 - y₁) * x₁ ^ 2 * (1 + y₂) * x₂ ^ 2 *
+                          ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 2 -
+                      (E.a - E.d) * (1 + y₁) * x₁ ^ 2 * (1 - y₂) * x₂ ^ 2 *
+                        ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 2) +
+                  (E.a - E.d) * (1 + y₁) * x₁ ^ 2 * (1 - y₂) * x₂ ^ 3 *
+                    ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 3)) -
+            (E.a - E.d) * x₁ * x₂ * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) * 0 *
+              ((1 - y₂) *
+                  ((1 - y₁) *
+                      (((1 + y₁) * (1 - y₂) * x₂ - (1 - y₁) * x₁ * (1 + y₂)) *
+                          (4 * ((1 + y₁) * (1 - y₂) * x₂ - (1 - y₁) * x₁ * (1 + y₂)) +
+                            (E.a - E.d) * x₁ * x₂ * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) * 0)
+                                -
+                        x₁ ^ 2 * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1 + y₂)) ^ 2 * 2 * (E.a
+                            + E.d)) -
+                    (E.a - E.d) * (1 + y₁) * x₁ ^ 2 * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 - y₁) * (1
+                        + y₂)) ^ 2) -
+                (E.a - E.d) * (1 - y₁) * x₁ ^ 2 * (1 + y₂) * x₂ ^ 2 * ((1 + y₁) * (1 - y₂) - (1 -
+                    y₁) * (1 + y₂)) ^ 2)) -
+        (E.a - E.d) ^ 3 * (1 - y₁) * x₁ ^ 3 * (1 - y₂) * x₂ ^ 3 * ((1 + y₁) * (1 - y₂) - (1 - y₁) *
+            (1 + y₂)) ^ 3 * 0) *
+      (x₁ * y₂ + y₁ * x₂) := by
+  linear_combination
+        (-256*E.a*x₁^2*y₁^3*x₂^4*y₂-256*E.d*x₁^2*y₁^3*x₂^4*y₂+512*E.a*x₁^2*y₁^2*x₂^4*y₂^2
+        -256*E.a*x₁^2*y₁*x₂^4*y₂^3-128*x₁^2*y₁^3*x₂^2*y₂^4+192*x₁*y₁^3*x₂^3*y₂^4-64*y₁^3*x₂^4*y₂^4
+        +64*x₁^2*y₁^2*x₂^2*y₂^5-64*x₁*y₁^2*x₂^3*y₂^5+512*E.a*x₁^2*y₁^3*x₂^4
+        -1024*E.a*x₁^2*y₁^2*x₂^4*y₂+512*E.a*x₁^2*y₁*x₂^4*y₂^2-128*x₁^2*y₁^3*x₂^2*y₂^3
+        -384*x₁*y₁^3*x₂^3*y₂^3+256*y₁^3*x₂^4*y₂^3+384*x₁^2*y₁^2*x₂^2*y₂^4+256*x₁*y₁^2*x₂^3*y₂^4
+        -128*y₁^2*x₂^4*y₂^4-128*x₁^2*y₁*x₂^2*y₂^5-128*x₁*y₁*x₂^3*y₂^5+512*E.a*x₁^2*y₁^2*x₂^4
+        -256*E.a*x₁^2*y₁*x₂^4*y₂+640*x₁^2*y₁^3*x₂^2*y₂^2-384*y₁^3*x₂^4*y₂^2-1024*x₁^2*y₁^2*x₂^2*y₂^3
+        -256*x₁*y₁^2*x₂^3*y₂^3+512*y₁^2*x₂^4*y₂^3+640*x₁^2*y₁*x₂^2*y₂^4+192*x₁*y₁*x₂^3*y₂^4
+        -64*y₁*x₂^4*y₂^4-192*x₁^2*x₂^2*y₂^5-64*x₁*x₂^3*y₂^5+128*x₁^2*y₁^3*x₂^2*y₂
+        +384*x₁*y₁^3*x₂^3*y₂+256*y₁^3*x₂^4*y₂+128*x₁^2*y₁^2*x₂^2*y₂^2-128*x₁*y₁^2*x₂^3*y₂^2
+        -768*y₁^2*x₂^4*y₂^2-384*x₁^2*y₁*x₂^2*y₂^3+128*x₁*y₁*x₂^3*y₂^3+256*y₁*x₂^4*y₂^3
+        +128*x₁^2*x₂^2*y₂^4+128*x₁*x₂^3*y₂^4-512*x₁^2*y₁^3*x₂^2-192*x₁*y₁^3*x₂^3-64*y₁^3*x₂^4
+        +960*x₁^2*y₁^2*x₂^2*y₂+320*x₁*y₁^2*x₂^3*y₂+512*y₁^2*x₂^4*y₂-640*x₁^2*y₁*x₂^2*y₂^2
+        -256*x₁*y₁*x₂^3*y₂^2-384*y₁*x₂^4*y₂^2+256*x₁^2*x₂^2*y₂^3-512*x₁^2*y₁^2*x₂^2-128*x₁*y₁^2*x₂^3
+        -128*y₁^2*x₂^4+512*x₁^2*y₁*x₂^2*y₂+256*y₁*x₂^4*y₂-128*x₁^2*x₂^2*y₂^2-128*x₁*x₂^3*y₂^2
+        +64*x₁*y₁*x₂^3-64*y₁*x₂^4-64*x₁^2*x₂^2*y₂+64*x₁*x₂^3*y₂) * h1 +
+        (512*E.d*x₁^4*y₁^5*x₂^2-1536*E.d*x₁^4*y₁^4*x₂^2*y₂+1536*E.d*x₁^4*y₁^3*x₂^2*y₂^2
+        -512*E.d*x₁^4*y₁^2*x₂^2*y₂^3+512*E.d*x₁^4*y₁^4*x₂^2+256*E.a*x₁^4*y₁^3*x₂^2*y₂
+        +64*x₁^3*y₁^5*x₂*y₂^2-512*E.a*x₁^4*y₁^2*x₂^2*y₂^2-512*E.d*x₁^4*y₁^2*x₂^2*y₂^2
+        -64*x₁^2*y₁^5*x₂^2*y₂^2+64*x₁^4*y₁^4*y₂^3-192*x₁^3*y₁^4*x₂*y₂^3+256*E.a*x₁^4*y₁*x₂^2*y₂^3
+        +256*E.d*x₁^4*y₁*x₂^2*y₂^3+128*x₁^2*y₁^4*x₂^2*y₂^3-512*E.a*x₁^4*y₁^3*x₂^2
+        +128*x₁^3*y₁^5*x₂*y₂+1024*E.a*x₁^4*y₁^2*x₂^2*y₂+128*x₁^2*y₁^5*x₂^2*y₂+128*x₁^4*y₁^4*y₂^2
+        -256*x₁^3*y₁^4*x₂*y₂^2-512*E.a*x₁^4*y₁*x₂^2*y₂^2-384*x₁^2*y₁^4*x₂^2*y₂^2-256*x₁^4*y₁^3*y₂^3
+        +384*x₁^3*y₁^3*x₂*y₂^3+128*x₁^2*y₁^3*x₂^2*y₂^3+64*x₁^3*y₁^5*x₂-512*E.a*x₁^4*y₁^2*x₂^2
+        -320*x₁^2*y₁^5*x₂^2+64*x₁^4*y₁^4*y₂-192*x₁^3*y₁^4*x₂*y₂+256*E.a*x₁^4*y₁*x₂^2*y₂
+        +896*x₁^2*y₁^4*x₂^2*y₂-512*x₁^4*y₁^3*y₂^2+256*x₁^3*y₁^3*x₂*y₂^2-512*x₁^2*y₁^3*x₂^2*y₂^2
+        +384*x₁^4*y₁^2*y₂^3-128*x₁^2*y₁^2*x₂^2*y₂^3-128*x₁^3*y₁^4*x₂-640*x₁^2*y₁^4*x₂^2
+        -256*x₁^4*y₁^3*y₂-128*x₁^3*y₁^3*x₂*y₂+384*x₁^2*y₁^3*x₂^2*y₂+768*x₁^4*y₁^2*y₂^2
+        +128*x₁^3*y₁^2*x₂*y₂^2+384*x₁^2*y₁^2*x₂^2*y₂^2-256*x₁^4*y₁*y₂^3-384*x₁^3*y₁*x₂*y₂^3
+        -128*x₁^2*y₁*x₂^2*y₂^3+256*x₁^2*y₁^3*x₂^2+384*x₁^4*y₁^2*y₂+256*x₁^3*y₁^2*x₂*y₂
+        -896*x₁^2*y₁^2*x₂^2*y₂-512*x₁^4*y₁*y₂^2-320*x₁^3*y₁*x₂*y₂^2+576*x₁^2*y₁*x₂^2*y₂^2
+        +64*x₁^4*y₂^3+192*x₁^3*x₂*y₂^3+128*x₁^3*y₁^2*x₂+640*x₁^2*y₁^2*x₂^2-256*x₁^4*y₁*y₂
+        -512*x₁^2*y₁*x₂^2*y₂+128*x₁^4*y₂^2+128*x₁^3*x₂*y₂^2-64*x₁^3*y₁*x₂+64*x₁^2*y₁*x₂^2+64*x₁^4*y₂
+        -64*x₁^3*x₂*y₂) * h2
+
+omit [DecidableEq F] [NeZero (2 : F)] in
+/-- Cofactor certificate for the **doubling** branch of `generic_addY` (one point after `subst`). -/
+private theorem cert_addY_double (E : TwistedEdwardsCurve F) {x₁ y₁ : F}
+    (h1 : E.a * x₁ ^ 2 + y₁ ^ 2 = 1 + E.d * x₁ ^ 2 * y₁ ^ 2) :
+    4 ^ 2 * (E.a - E.d) * (1 - E.d * y₁ ^ 2 * x₁ ^ 2 + (y₁ ^ 2 - E.a * x₁ ^ 2)) * (1 + E.d * y₁ ^ 2
+        * x₁ ^ 2) *
+          (1 + y₁) ^ 3 *
+        (1 - y₁) ^ 3 *
+      (1 - -1) ^ 3 =
+    -(y₁ * (1 - E.d * y₁ ^ 2 * x₁ ^ 2 - (y₁ ^ 2 - E.a * x₁ ^ 2)) * (1 + 1) *
+        (x₁ ^ 2 *
+              ((1 + y₁) * ((E.a - E.d) * 3 * (1 + y₁) + (1 - y₁) * 2 ^ 2 * (E.a + E.d)) + (E.a -
+                  E.d) * (1 - y₁) ^ 2) *
+            (x₁ ^ 2 *
+                      ((1 + y₁) * ((E.a - E.d) * 3 * (1 + y₁) + (1 - y₁) * 2 ^ 2 * (E.a + E.d)) +
+                          (E.a - E.d) * (1 - y₁) ^ 2) ^
+                        2 -
+                    4 * (1 + y₁) ^ 2 * (1 - y₁) ^ 2 * 2 * (E.a + E.d) * (1 - -1) ^ 2 -
+                  4 * (E.a - E.d) * (1 + y₁) ^ 3 * (1 - y₁) * (1 - -1) ^ 2 -
+                4 * (E.a - E.d) * (1 + y₁) ^ 3 * (1 - y₁) * (1 - -1) ^ 2 -
+              4 * (E.a - E.d) * (1 + y₁) ^ 3 * (1 - y₁) * (1 - -1) ^ 2) +
+          4 ^ 2 * (E.a - E.d) * (1 + y₁) ^ 4 * (1 - y₁) ^ 2 * (1 - -1) ^ 3)) := by
+  linear_combination
+      (-1024*E.d^3*x₁^4*y₁^7+1536*E.a*E.d^2*x₁^4*y₁^6-1536*E.d^3*x₁^4*y₁^6-768*E.a^2*E.d*x₁^4*y₁^5
+      +4608*E.a*E.d^2*x₁^4*y₁^5-768*E.d^3*x₁^4*y₁^5-128*E.a*E.d*x₁^2*y₁^8+128*E.d^2*x₁^2*y₁^8
+      +128*E.a^3*x₁^4*y₁^4-3456*E.a^2*E.d*x₁^4*y₁^4+3456*E.a*E.d^2*x₁^4*y₁^4-128*E.d^3*x₁^4*y₁^4
+      -256*E.a*E.d*x₁^2*y₁^7-768*E.d^2*x₁^2*y₁^7+768*E.a^3*x₁^4*y₁^3-4608*E.a^2*E.d*x₁^4*y₁^3
+      +768*E.a*E.d^2*x₁^4*y₁^3-128*E.a^2*x₁^2*y₁^6+1408*E.a*E.d*x₁^2*y₁^6-1280*E.d^2*x₁^2*y₁^6
+      +1536*E.a^3*x₁^4*y₁^2-1536*E.a^2*E.d*x₁^4*y₁^2-512*E.a^2*x₁^2*y₁^5+3328*E.a*E.d*x₁^2*y₁^5
+      +256*E.d^2*x₁^2*y₁^5+1024*E.a^3*x₁^4*y₁-768*E.a^2*x₁^2*y₁^4-384*E.a*E.d*x₁^2*y₁^4
+      +1152*E.d^2*x₁^2*y₁^4-256*E.a*y₁^7+256*E.d*y₁^7-256*E.a^2*x₁^2*y₁^3-3328*E.a*E.d*x₁^2*y₁^3
+      +512*E.d^2*x₁^2*y₁^3-640*E.a*y₁^6+640*E.d*y₁^6+896*E.a^2*x₁^2*y₁^2-896*E.a*E.d*x₁^2*y₁^2
+      +256*E.a*y₁^5-256*E.d*y₁^5+768*E.a^2*x₁^2*y₁+256*E.a*E.d*x₁^2*y₁+1152*E.a*y₁^4-1152*E.d*y₁^4
+      +256*E.a*y₁^3-256*E.d*y₁^3-384*E.a*y₁^2+384*E.d*y₁^2-256*E.a*y₁+256*E.d*y₁-128*E.a+128*E.d) *
+      h1
+
 /-- **Piece C** (X-coordinate match): the TwistedEdwardsCurve sum's W-`x` equals Weierstrass `addX`.
 Discharge by splitting `y₁ = y₂` / `y₁ ≠ y₂` (so `slope` is concrete), `field_simp`, then
 `linear_combination` against `h1, h2`. -/
@@ -166,15 +373,16 @@ theorem generic_addX (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
       rw [div_eq_one_iff_eq (by rw [show (1 : F) - E.d * x₁ * x₁ * y₁ * y₁
         = 1 - E.d * y₁ ^ 2 * x₁ ^ 2 from by ring]; exact hnegD)]
       linear_combination -hh
-    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass, WeierstrassCurve.Affine.addX,
+    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass,
+        WeierstrassCurve.Affine.addX,
       WeierstrassCurve.Affine.negY, toMontU, toMontV, TwistedEdwardsCurve.addCoords, zero_mul,
       sub_zero, add_zero]
     have h2c : (1 : F) - -1 ≠ 0 := by
       rw [show (1 : F) - -1 = 2 from by ring]; exact MontgomeryCurve.two_ne_zero
     field_simp [hy1p, hsumnumD, hnegD, h2c]
     rw [TwistedEdwardsCurve.Equation] at h1
-    -- single-point (doubling) cofactor from Singular `lift` mod ⟨h1⟩; re-checked by `ring`.
-    linear_combination (-64*E.d^2*x₁^2*y₁^4+64*E.a*E.d*x₁^2*y₁^3-64*E.d^2*x₁^2*y₁^3-16*E.a^2*x₁^2*y₁^2+160*E.a*E.d*x₁^2*y₁^2-16*E.d^2*x₁^2*y₁^2-64*E.a^2*x₁^2*y₁+64*E.a*E.d*x₁^2*y₁+16*E.a*y₁^4-80*E.d*y₁^4-64*E.a^2*x₁^2+64*E.a*y₁^3-64*E.d*y₁^3+64*E.a*y₁^2+64*E.d*y₁^2-64*E.a*y₁+64*E.d*y₁-80*E.a+16*E.d) * h1
+    -- single-point (doubling) cofactor: dispatch to the isolated certificate lemma.
+    exact E.cert_addX_double h1
   · rw [WeierstrassCurve.Affine.slope_of_X_ne hUU]
     have hyne : y₁ ≠ y₂ := fun h => hUU (by rw [h])
     have hneg' : (1 : F) - E.d * y₁ * y₂ * x₁ * x₂ ≠ 0 := by
@@ -190,16 +398,13 @@ theorem generic_addX (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
       rw [div_eq_one_iff_eq (by rw [show (1 : F) - E.d * x₁ * x₂ * y₁ * y₂
         = 1 - E.d * y₁ * y₂ * x₁ * x₂ from by ring]; exact hneg')]
       linear_combination -hh
-    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass, WeierstrassCurve.Affine.addX,
+    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass,
+        WeierstrassCurve.Affine.addX,
       toMontU, toMontV, TwistedEdwardsCurve.addCoords]
     field_simp [hslopeden, hsumnum, hneg']
     rw [TwistedEdwardsCurve.Equation] at h1 h2
-    -- Cofactors from an external Gröbner `lift` of the cleared identity mod ⟨h1, h2⟩ (Singular);
-    -- re-checked here by `ring` inside `linear_combination`, so the CAS is untrusted.
-    linear_combination
-      (16*E.a*x₁*y₁^2*x₂^3*y₂^2-16*E.a*x₁*y₁*x₂^3*y₂^3-48*E.a*x₁*y₁^2*x₂^3*y₂-16*E.d*x₁*y₁^2*x₂^3*y₂+64*E.a*x₁*y₁*x₂^3*y₂^2-16*E.a*x₁*x₂^3*y₂^3-16*x₁*y₁^2*x₂*y₂^4+16*y₁^2*x₂^2*y₂^4+48*E.a*x₁*y₁^2*x₂^3-96*E.a*x₁*y₁*x₂^3*y₂-16*E.d*x₁*y₁*x₂^3*y₂+48*E.a*x₁*x₂^3*y₂^2-16*x₁*y₁^2*x₂*y₂^3-48*y₁^2*x₂^2*y₂^3+48*x₁*y₁*x₂*y₂^4+16*y₁*x₂^2*y₂^4+64*E.a*x₁*y₁*x₂^3-48*E.a*x₁*x₂^3*y₂+64*x₁*y₁^2*x₂*y₂^2+48*y₁^2*x₂^2*y₂^2-48*x₁*y₁*x₂*y₂^3-64*y₁*x₂^2*y₂^3+16*E.a*x₁*x₂^3+16*x₁*y₁^2*x₂*y₂-16*y₁^2*x₂^2*y₂-32*x₁*y₁*x₂*y₂^2+96*y₁*x₂^2*y₂^2-32*x₁*x₂*y₂^3-16*x₂^2*y₂^3-48*x₁*y₁^2*x₂+48*x₁*y₁*x₂*y₂-64*y₁*x₂^2*y₂+32*x₁*x₂*y₂^2+48*x₂^2*y₂^2-16*x₁*y₁*x₂+16*y₁*x₂^2+32*x₁*x₂*y₂-48*x₂^2*y₂-32*x₁*x₂+16*x₂^2) * h1 +
-      (48*E.d*x₁^3*y₁^4*x₂-16*E.a*x₁^3*y₁^3*x₂*y₂-96*E.d*x₁^3*y₁^3*x₂*y₂+16*E.a*x₁^3*y₁^2*x₂*y₂^2+48*E.d*x₁^3*y₁^2*x₂*y₂^2-16*E.a*x₁^3*y₁^3*x₂+16*E.d*x₁^3*y₁^3*x₂+64*E.a*x₁^3*y₁^2*x₂*y₂+16*E.d*x₁^3*y₁^2*x₂*y₂+16*x₁^2*y₁^4*y₂^2-48*E.a*x₁^3*y₁*x₂*y₂^2-16*E.d*x₁^3*y₁*x₂*y₂^2-16*x₁*y₁^4*x₂*y₂^2+32*E.d*x₁^3*y₁^2*x₂+16*x₁^2*y₁^4*y₂-16*E.d*x₁^3*y₁*x₂*y₂+48*x₁*y₁^4*x₂*y₂-48*x₁^2*y₁^3*y₂^2-16*x₁*y₁^3*x₂*y₂^2-64*E.a*x₁^3*y₁*x₂-48*x₁*y₁^4*x₂-64*x₁^2*y₁^3*y₂+48*E.a*x₁^3*x₂*y₂+48*x₁*y₁^3*x₂*y₂+48*x₁^2*y₁^2*y₂^2+16*x₁*y₁^2*x₂*y₂^2-16*x₁^2*y₁^3-16*E.a*x₁^3*x₂-48*x₁*y₁^3*x₂+96*x₁^2*y₁^2*y₂-48*x₁*y₁^2*x₂*y₂-16*x₁^2*y₁*y₂^2+16*x₁*y₁*x₂*y₂^2+48*x₁^2*y₁^2+48*x₁*y₁^2*x₂-64*x₁^2*y₁*y₂-48*x₁*y₁*x₂*y₂-48*x₁^2*y₁+48*x₁*y₁*x₂+16*x₁^2*y₂+16*x₁^2) * h2
-set_option linter.style.longLine false in -- Singular cofactor cert below is a single long line
+    -- Secant-case cofactors: dispatch to the isolated certificate lemma.
+    exact E.cert_addX_secant h1 h2
 /-- The **secant** case of `generic_addY`. The `sumX ≠ 0` leaf reuses the proven
 `generic_addX` (via `toMontV x y = toMontU y / x`, `toMontV_eq_toMontU_div`) to rewrite the
 LHS `B² · toMontV sumX sumY` as `B · addX / sumX`, turning the goal into the lower-degree
@@ -263,7 +468,7 @@ theorem generic_addY_secant (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F
     have hY2 : y₂ = -y₁ := by
       have hfac : (y₁ + y₂) * ((E.d * x₁ * x₂ * y₁ * y₂) ^ 2 - 1) = 0 := by
         rw [TwistedEdwardsCurve.Equation] at h1 h2
-        linear_combination (-E.d*x₁*x₂*y₂^3-E.d*x₂^2*y₂^3+E.a*x₂^2*y₂+y₂^3+y₂) * h1 + (-E.d*x₁^2*y₁^2*y₂+E.d*x₁^2*y₁*y₂^2+y₂) * h2 + (E.d^2*x₁^2*y₁^2*x₂*y₂^2+2*E.a*E.d*x₁^2*y₁*x₂*y₂+E.a*E.d*x₁^2*x₂*y₂^2-E.d*x₁*y₁*y₂^3+E.d*y₁*x₂*y₂^3-E.d*x₁*y₁*y₂-E.a*y₁*x₂*y₂-E.a*x₁*y₂^2-E.a*x₁) * hsX + (2*E.d*x₁^2*y₁*y₂^2+E.d*x₁*y₁*x₂*y₂^2-E.d*x₁*x₂*y₂^3+E.a*x₁*x₂*y₂-y₁*y₂^2-y₁+y₂) * gsY
+        exact E.cert_secant_negY h1 h2 hsX gsY
       rcases mul_eq_zero.mp hfac with h | h
       · linear_combination h
       · exact absurd (by linear_combination h) (E.lam_sq_ne_one h1 h2)
@@ -285,7 +490,8 @@ theorem generic_addY_secant (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F
       mul_zero]
     simp only [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY]
     rw [hAX0]
-    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass, WeierstrassCurve.Affine.negY,
+    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass,
+        WeierstrassCurve.Affine.negY,
       toMontU, toMontV, mul_zero, sub_zero]
     field_simp [hslopeden]
     ring
@@ -297,11 +503,13 @@ theorem generic_addY_secant (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F
     have hC := E.generic_addX h1 h2 hP hQ hinv
     rw [WeierstrassCurve.Affine.slope_of_X_ne hUU] at hC
     -- Reshape the LHS: `B² · toMontV sumX sumY = B · (B · toMontU sumY) / sumX = B · addX / sumX`.
-    rw [toMontV_eq_toMontU_div, mul_div_assoc', show E.toMontgomery.B ^ 2 = E.toMontgomery.B * E.toMontgomery.B from by ring,
+    rw [toMontV_eq_toMontU_div, mul_div_assoc', show E.toMontgomery.B ^ 2 = E.toMontgomery.B *
+        E.toMontgomery.B from by ring,
       mul_assoc, hC]
     -- Now `B · addX / sumX = addY`; clear `sumX` (nonzero) → `B · addX = addY · sumX`.
     rw [div_eq_iff hsX0]
-    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass, WeierstrassCurve.Affine.addY,
+    simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass,
+        WeierstrassCurve.Affine.addY,
       WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY,
       toMontU, toMontV, TwistedEdwardsCurve.addCoords]
     have hsX2 : y₂ * x₁ + y₁ * x₂ ≠ 0 := by
@@ -310,13 +518,11 @@ theorem generic_addY_secant (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F
       rw [show (1 : F) + E.d * y₁ * x₁ * y₂ * x₂ = 1 + E.d * x₁ * x₂ * y₁ * y₂ by ring]; exact hpos
     field_simp [hslopeden, hsumnum, hneg', hsumXnum, hsX2, hpos, hpos']
     rw [TwistedEdwardsCurve.Equation] at h1 h2
-    linear_combination
-      (-256*E.a*x₁^2*y₁^3*x₂^4*y₂-256*E.d*x₁^2*y₁^3*x₂^4*y₂+512*E.a*x₁^2*y₁^2*x₂^4*y₂^2-256*E.a*x₁^2*y₁*x₂^4*y₂^3-128*x₁^2*y₁^3*x₂^2*y₂^4+192*x₁*y₁^3*x₂^3*y₂^4-64*y₁^3*x₂^4*y₂^4+64*x₁^2*y₁^2*x₂^2*y₂^5-64*x₁*y₁^2*x₂^3*y₂^5+512*E.a*x₁^2*y₁^3*x₂^4-1024*E.a*x₁^2*y₁^2*x₂^4*y₂+512*E.a*x₁^2*y₁*x₂^4*y₂^2-128*x₁^2*y₁^3*x₂^2*y₂^3-384*x₁*y₁^3*x₂^3*y₂^3+256*y₁^3*x₂^4*y₂^3+384*x₁^2*y₁^2*x₂^2*y₂^4+256*x₁*y₁^2*x₂^3*y₂^4-128*y₁^2*x₂^4*y₂^4-128*x₁^2*y₁*x₂^2*y₂^5-128*x₁*y₁*x₂^3*y₂^5+512*E.a*x₁^2*y₁^2*x₂^4-256*E.a*x₁^2*y₁*x₂^4*y₂+640*x₁^2*y₁^3*x₂^2*y₂^2-384*y₁^3*x₂^4*y₂^2-1024*x₁^2*y₁^2*x₂^2*y₂^3-256*x₁*y₁^2*x₂^3*y₂^3+512*y₁^2*x₂^4*y₂^3+640*x₁^2*y₁*x₂^2*y₂^4+192*x₁*y₁*x₂^3*y₂^4-64*y₁*x₂^4*y₂^4-192*x₁^2*x₂^2*y₂^5-64*x₁*x₂^3*y₂^5+128*x₁^2*y₁^3*x₂^2*y₂+384*x₁*y₁^3*x₂^3*y₂+256*y₁^3*x₂^4*y₂+128*x₁^2*y₁^2*x₂^2*y₂^2-128*x₁*y₁^2*x₂^3*y₂^2-768*y₁^2*x₂^4*y₂^2-384*x₁^2*y₁*x₂^2*y₂^3+128*x₁*y₁*x₂^3*y₂^3+256*y₁*x₂^4*y₂^3+128*x₁^2*x₂^2*y₂^4+128*x₁*x₂^3*y₂^4-512*x₁^2*y₁^3*x₂^2-192*x₁*y₁^3*x₂^3-64*y₁^3*x₂^4+960*x₁^2*y₁^2*x₂^2*y₂+320*x₁*y₁^2*x₂^3*y₂+512*y₁^2*x₂^4*y₂-640*x₁^2*y₁*x₂^2*y₂^2-256*x₁*y₁*x₂^3*y₂^2-384*y₁*x₂^4*y₂^2+256*x₁^2*x₂^2*y₂^3-512*x₁^2*y₁^2*x₂^2-128*x₁*y₁^2*x₂^3-128*y₁^2*x₂^4+512*x₁^2*y₁*x₂^2*y₂+256*y₁*x₂^4*y₂-128*x₁^2*x₂^2*y₂^2-128*x₁*x₂^3*y₂^2+64*x₁*y₁*x₂^3-64*y₁*x₂^4-64*x₁^2*x₂^2*y₂+64*x₁*x₂^3*y₂) * h1 +
-      (512*E.d*x₁^4*y₁^5*x₂^2-1536*E.d*x₁^4*y₁^4*x₂^2*y₂+1536*E.d*x₁^4*y₁^3*x₂^2*y₂^2-512*E.d*x₁^4*y₁^2*x₂^2*y₂^3+512*E.d*x₁^4*y₁^4*x₂^2+256*E.a*x₁^4*y₁^3*x₂^2*y₂+64*x₁^3*y₁^5*x₂*y₂^2-512*E.a*x₁^4*y₁^2*x₂^2*y₂^2-512*E.d*x₁^4*y₁^2*x₂^2*y₂^2-64*x₁^2*y₁^5*x₂^2*y₂^2+64*x₁^4*y₁^4*y₂^3-192*x₁^3*y₁^4*x₂*y₂^3+256*E.a*x₁^4*y₁*x₂^2*y₂^3+256*E.d*x₁^4*y₁*x₂^2*y₂^3+128*x₁^2*y₁^4*x₂^2*y₂^3-512*E.a*x₁^4*y₁^3*x₂^2+128*x₁^3*y₁^5*x₂*y₂+1024*E.a*x₁^4*y₁^2*x₂^2*y₂+128*x₁^2*y₁^5*x₂^2*y₂+128*x₁^4*y₁^4*y₂^2-256*x₁^3*y₁^4*x₂*y₂^2-512*E.a*x₁^4*y₁*x₂^2*y₂^2-384*x₁^2*y₁^4*x₂^2*y₂^2-256*x₁^4*y₁^3*y₂^3+384*x₁^3*y₁^3*x₂*y₂^3+128*x₁^2*y₁^3*x₂^2*y₂^3+64*x₁^3*y₁^5*x₂-512*E.a*x₁^4*y₁^2*x₂^2-320*x₁^2*y₁^5*x₂^2+64*x₁^4*y₁^4*y₂-192*x₁^3*y₁^4*x₂*y₂+256*E.a*x₁^4*y₁*x₂^2*y₂+896*x₁^2*y₁^4*x₂^2*y₂-512*x₁^4*y₁^3*y₂^2+256*x₁^3*y₁^3*x₂*y₂^2-512*x₁^2*y₁^3*x₂^2*y₂^2+384*x₁^4*y₁^2*y₂^3-128*x₁^2*y₁^2*x₂^2*y₂^3-128*x₁^3*y₁^4*x₂-640*x₁^2*y₁^4*x₂^2-256*x₁^4*y₁^3*y₂-128*x₁^3*y₁^3*x₂*y₂+384*x₁^2*y₁^3*x₂^2*y₂+768*x₁^4*y₁^2*y₂^2+128*x₁^3*y₁^2*x₂*y₂^2+384*x₁^2*y₁^2*x₂^2*y₂^2-256*x₁^4*y₁*y₂^3-384*x₁^3*y₁*x₂*y₂^3-128*x₁^2*y₁*x₂^2*y₂^3+256*x₁^2*y₁^3*x₂^2+384*x₁^4*y₁^2*y₂+256*x₁^3*y₁^2*x₂*y₂-896*x₁^2*y₁^2*x₂^2*y₂-512*x₁^4*y₁*y₂^2-320*x₁^3*y₁*x₂*y₂^2+576*x₁^2*y₁*x₂^2*y₂^2+64*x₁^4*y₂^3+192*x₁^3*x₂*y₂^3+128*x₁^3*y₁^2*x₂+640*x₁^2*y₁^2*x₂^2-256*x₁^4*y₁*y₂-512*x₁^2*y₁*x₂^2*y₂+128*x₁^4*y₂^2+128*x₁^3*x₂*y₂^2-64*x₁^3*y₁*x₂+64*x₁^2*y₁*x₂^2+64*x₁^4*y₂-64*x₁^3*x₂*y₂) * h2
+    exact E.cert_addY_secant h1 h2
 
 
-set_option linter.style.longLine false in -- Singular cofactor certs below are single long lines
-/-- **Piece D** (Y-coordinate match): the TwistedEdwardsCurve sum's W-`y` equals Weierstrass `addY`. -/
+/-- **Piece D** (Y-coordinate match): the TwistedEdwardsCurve sum's W-`y` equals Weierstrass
+`addY`. -/
 theorem generic_addY (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
     (h1 : E.Equation x₁ y₁) (h2 : E.Equation x₂ y₂)
     (hP : ¬(x₁ = 0 ∧ y₁ = 1)) (hQ : ¬(x₂ = 0 ∧ y₂ = 1)) (hinv : ¬(x₂ = -x₁ ∧ y₂ = y₁)) :
@@ -371,7 +577,8 @@ theorem generic_addY (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
       TwistedEdwardsCurve.addCoords]
     field_simp [h1y2p, hx2]
     rw [TwistedEdwardsCurve.Equation] at h2
-    linear_combination (-4096 * x₂ * y₂ ^ 3 - 12288 * x₂ * y₂ ^ 2 - 12288 * x₂ * y₂ - 4096 * x₂) * h2
+    linear_combination (-4096 * x₂ * y₂ ^ 3 - 12288 * x₂ * y₂ ^ 2 - 12288 * x₂ * y₂ - 4096 * x₂) *
+        h2
   by_cases hx2 : x₂ = 0
   · -- **2-torsion input** `Q = (0, -1)`; sum `= (-x₁, -y₁)`, so `sumX = -x₁ ≠ 0`.
     subst hx2
@@ -446,9 +653,11 @@ theorem generic_addY (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
       subst hy10
       have hsX0 : (E.addCoords x₁ (0 : F) x₁ 0).1 = 0 := by simp [TwistedEdwardsCurve.addCoords]
       rw [hsX0]
-      simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass, WeierstrassCurve.Affine.addY,
+      simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass,
+          WeierstrassCurve.Affine.addY,
         WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY,
-        toMontU, toMontV, TwistedEdwardsCurve.addCoords, mul_zero, zero_mul, sub_zero, add_zero, div_zero,
+        toMontU, toMontV, TwistedEdwardsCurve.addCoords, mul_zero, zero_mul, sub_zero, add_zero,
+            div_zero,
         zero_div]
       field_simp
       rw [TwistedEdwardsCurve.Equation] at h1
@@ -461,14 +670,15 @@ theorem generic_addY (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
         rw [div_eq_one_iff_eq (by rw [show (1 : F) - E.d * x₁ * x₁ * y₁ * y₁
           = 1 - E.d * y₁ ^ 2 * x₁ ^ 2 from by ring]; exact hnegD)]
         linear_combination -hh
-      simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass, WeierstrassCurve.Affine.addY,
+      simp only [TwistedEdwardsCurve.toMontgomery, MontgomeryCurve.toWeierstrass,
+          WeierstrassCurve.Affine.addY,
         WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.negY,
         toMontU, toMontV, TwistedEdwardsCurve.addCoords, zero_mul, sub_zero, add_zero]
       have h11 : (1 : F) + 1 ≠ 0 := by
         rw [show (1 : F) + 1 = 2 by ring]; exact MontgomeryCurve.two_ne_zero
       field_simp [hy1p, hsumnumD, hnegD, h2c, hy10, h11]
       rw [TwistedEdwardsCurve.Equation] at h1
-      linear_combination (-1024*E.d^3*x₁^4*y₁^7+1536*E.a*E.d^2*x₁^4*y₁^6-1536*E.d^3*x₁^4*y₁^6-768*E.a^2*E.d*x₁^4*y₁^5+4608*E.a*E.d^2*x₁^4*y₁^5-768*E.d^3*x₁^4*y₁^5-128*E.a*E.d*x₁^2*y₁^8+128*E.d^2*x₁^2*y₁^8+128*E.a^3*x₁^4*y₁^4-3456*E.a^2*E.d*x₁^4*y₁^4+3456*E.a*E.d^2*x₁^4*y₁^4-128*E.d^3*x₁^4*y₁^4-256*E.a*E.d*x₁^2*y₁^7-768*E.d^2*x₁^2*y₁^7+768*E.a^3*x₁^4*y₁^3-4608*E.a^2*E.d*x₁^4*y₁^3+768*E.a*E.d^2*x₁^4*y₁^3-128*E.a^2*x₁^2*y₁^6+1408*E.a*E.d*x₁^2*y₁^6-1280*E.d^2*x₁^2*y₁^6+1536*E.a^3*x₁^4*y₁^2-1536*E.a^2*E.d*x₁^4*y₁^2-512*E.a^2*x₁^2*y₁^5+3328*E.a*E.d*x₁^2*y₁^5+256*E.d^2*x₁^2*y₁^5+1024*E.a^3*x₁^4*y₁-768*E.a^2*x₁^2*y₁^4-384*E.a*E.d*x₁^2*y₁^4+1152*E.d^2*x₁^2*y₁^4-256*E.a*y₁^7+256*E.d*y₁^7-256*E.a^2*x₁^2*y₁^3-3328*E.a*E.d*x₁^2*y₁^3+512*E.d^2*x₁^2*y₁^3-640*E.a*y₁^6+640*E.d*y₁^6+896*E.a^2*x₁^2*y₁^2-896*E.a*E.d*x₁^2*y₁^2+256*E.a*y₁^5-256*E.d*y₁^5+768*E.a^2*x₁^2*y₁+256*E.a*E.d*x₁^2*y₁+1152*E.a*y₁^4-1152*E.d*y₁^4+256*E.a*y₁^3-256*E.d*y₁^3-384*E.a*y₁^2+384*E.d*y₁^2-256*E.a*y₁+256*E.d*y₁-128*E.a+128*E.d) * h1
+      exact E.cert_addY_double h1
   · exact E.generic_addY_secant h1 h2 hP hQ hinv hUU hx1 hx2
 
 
