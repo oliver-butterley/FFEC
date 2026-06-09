@@ -6,12 +6,12 @@ We restrict to finite fields Fp.
 
 An elliptic curve over Fp is pair: j-invariant, small galois thing
 
-Model (p, curve): 
+Model (p, curve):
 - number of variables n
-- mv polynomial (n variables), 
+- mv polynomial (n variables),
 - zero (0-point in Fp^(n+1))
-- tuple of mv polynomial representing addition, 
-- mv polynomial representing negation 
+- tuple of mv polynomial representing addition,
+- mv polynomial representing negation
 
 IsGroupModel (p, curve) extends Model (p, curve):
 - validity proofs (all prop valued)
@@ -25,7 +25,7 @@ Theorem (p, curve, M : Model (p, curve), M' (p, curve)) : IsGroupModel M <-> IsG
 
 Working with points on the curve is key. For this we use the fields of Model
 
-Strategy: avoid reproving group structure of all the other models because we can take from the already proven results about Weierstrass. 
+Strategy: avoid reproving group structure of all the other models because we can take from the already proven results about Weierstrass.
 
 Key models:
 - Montgomery

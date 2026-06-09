@@ -683,4 +683,3 @@ theorem generic_addY (E : TwistedEdwardsCurve F) {x₁ y₁ x₂ y₂ : F}
 
 
 end TwistedEdwardsCurve
-
