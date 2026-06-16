@@ -1,5 +1,5 @@
-import FFEC.Montgomery.Equiv
-import FFEC.Framework
+import FFEC.Messy.Montgomery.Equiv
+import FFEC.Messy.Framework
 
 /-!
 # MontgomeryCurve point group, explicit law, and X25519 ladder identities
@@ -311,4 +311,3 @@ example (M : MontgomeryCurve F) {x₁ y₁ x₂ y₂ : F}
   add_comm _ _
 
 end MontgomeryCurve
-

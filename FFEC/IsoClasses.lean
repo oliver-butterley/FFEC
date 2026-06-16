@@ -1,16 +1,27 @@
-import Mathlib
+module
+public import Mathlib.FieldTheory.Finite.GaloisField
 
-variable (p : Nat) [Fact p.Prime]
+public section
+
+variable (p : Nat) [Fact p.Prime] [Fact (3 < p)]
 
 notation "𝔽["p"]" => GaloisField p 1
+
 abbrev J :=  𝔽[p] × 𝔽[p]ˣ
+-- (j, D) : J
+-- j fixes the curve up to iso — over the algebraic closure 𝔽̄
+-- (j, D) fixes the curve up to iso — over 𝔽
+-- (j, D, model, coordinates) specific equation
 
 variable {p} in
+/-- The order of the `Aut(E)` for an elliptic curve `E/K` under the assumption that `3 < char(K)`.
+Silverman 1986, Theorem 10.1. -/
 noncomputable def nJ (x : 𝔽[p]) : Nat :=
   match (GaloisField.equivZmodP p x).val with
   | 0 => 6
   | 1728 => 4
-  | _ => 0
+  | _ => 2
+  -- More options if we relax the requirement that `3 < p`
 
 instance ellRel : Setoid (J p) where
   r := fun (j₁, D₁) (j₂, D₂) ↦ j₁ = j₂ ∧ ∃ k, D₁ * D₂⁻¹ = k ^ (nJ j₁)
@@ -34,7 +45,4 @@ instance ellRel : Setoid (J p) where
       have : (k1 * k2) ^ nJ j₃ = k1 ^ nJ j₃ * (k2 ^ nJ j₃) := by rw [mul_pow]
       rw [this, ← hk1, ← hk2, ← mul_assoc, inv_mul_cancel_right]
 
-/- ## Homework
-- Use the equivalence relation to define the quotient
-- Define the elliptic curve using this quotient
-- Attach to a J invariant the different models (literature search) -/
+abbrev EllipticCurveUpToIso := Quotient (ellRel p)

@@ -1,4 +1,4 @@
-import FFEC.Montgomery.Group
+import FFEC.Messy.Montgomery.Group
 
 /-!
 # TwistedEdwardsCurve model (composes through MontgomeryCurve)
@@ -308,4 +308,3 @@ noncomputable def TwistedEdwardsCurve.toMontgomeryAddEquiv (E : TwistedEdwardsCu
   (Equiv.addEquiv E.pointEquiv).trans (Equiv.addEquiv (E.toMontgomery).pointEquiv).symm
 
 end Field
-

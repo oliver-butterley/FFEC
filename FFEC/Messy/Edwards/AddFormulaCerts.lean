@@ -1,4 +1,4 @@
-import FFEC.Edwards.AddFormulaBase
+import FFEC.Messy.Edwards.AddFormulaBase
 
 /-! # `addFormula_eq_add`, part 2/3 — the coordinate-match certificates (pieces C and D).
 These carry the large `linear_combination` certificates (Singular-computed, `ring`-checked),

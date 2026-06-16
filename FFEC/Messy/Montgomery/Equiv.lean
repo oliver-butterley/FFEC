@@ -1,4 +1,4 @@
-import FFEC.Montgomery.ToWeierstrass
+import FFEC.Messy.Montgomery.ToWeierstrass
 
 /-!
 # MontgomeryCurve ≃ Weierstrass on points (the per-model datum)
@@ -100,4 +100,3 @@ theorem pointEquiv_some (M : MontgomeryCurve F) {x y : F} (h : M.Equation x y) :
           ((WeierstrassCurve.Affine.equation_iff_nonsingular).mp (equation_toW M h)) := rfl
 
 end MontgomeryCurve
-

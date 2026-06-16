@@ -1,4 +1,5 @@
-import FFEC.Montgomery.Defs
+import FFEC.Messy.Montgomery.Defs
+import FFEC.Equivalences.WeierstrassToMongomery
 
 /-!
 # MontgomeryCurve → Weierstrass
@@ -37,11 +38,4 @@ theorem toWeierstrass_Δ (M : MontgomeryCurve R) :
   simp only [toWeierstrass]
   ring
 
-/-- The `j`-invariant of the Montgomery curve, defined via its Weierstrass realization.
-(`WeierstrassCurve.j` needs `[IsElliptic]` — available wherever the curve is nondegenerate, e.g.
-over `𝔽 p` with `char ≠ 2`.) -/
-noncomputable def j (M : MontgomeryCurve R) [(M.toWeierstrass).IsElliptic] : R :=
-  (M.toWeierstrass).j
-
 end MontgomeryCurve
-

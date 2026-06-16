@@ -1,4 +1,4 @@
-import FFEC.Edwards.Defs
+import FFEC.Messy.Edwards.Defs
 
 /-! # `addFormula_eq_add`, part 1/3 — supporting lemmas (no heavy certificates).
 Definitions + completeness + the bridge computation lemmas + cases A/B/identity/inverse.
@@ -309,4 +309,3 @@ theorem y_ne_one (E : TwistedEdwardsCurve F) {x y : F} (h : E.Equation x y)
 
 
 end TwistedEdwardsCurve
-

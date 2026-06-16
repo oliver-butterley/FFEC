@@ -1,17 +1,15 @@
-import FFEC.Field
+module
+public import Mathlib.Algebra.Group.Units.Defs
+public import Mathlib.Algebra.Ring.Defs
+
+public section
 
 /-!
-# MontgomeryCurve model: definitions
+# Montgomery equations of elliptic curves
 
 A Montgomery curve `B y² = x³ + A x² + x` with nondegeneracy `IsUnit (B (A² − 4))`. Defined over an
-arbitrary `[CommRing R]` (the structure, `Equation`, `Point`, and base change `map`); the point
-group specializes to a field later.
-
-The basis of the Montgomery chain: `ToWeierstrass` (the Weierstrass embedding, `Δ`, `IsElliptic`,
-`j`), `Equiv` (the point bijection to Weierstrass), and `Group` (the transported group + explicit
-law) all build on this file. `Edwards.Defs` also targets it via the birational `toMontgomery`.
+arbitrary `[CommRing R]`.
 -/
-
 
 variable {R : Type*} [CommRing R]
 
@@ -42,28 +40,9 @@ inductive Point (M : MontgomeryCurve R)
   | some (x y : R) (h : M.Equation x y)
   deriving DecidableEq
 
-variable {R' : Type*} [CommRing R']
-
-/-- Base change of a Montgomery curve along a ring hom `f : R →+* R'` (mirrors
-`WeierstrassCurve.map`). The `IsUnit` nondegeneracy transports via `IsUnit.map`. -/
-def map (M : MontgomeryCurve R) (f : R →+* R') : MontgomeryCurve R' where
-  A := f M.A
-  B := f M.B
-  nondegen := by
-    have e : f M.B * (f M.A ^ 2 - 4) = f (M.B * (M.A ^ 2 - 4)) := by
-      simp only [map_mul, map_sub, map_pow, map_ofNat]
-    rw [e]; exact M.nondegen.map f
-
-@[simp] theorem map_A (M : MontgomeryCurve R) (f : R →+* R') : (M.map f).A = f M.A := rfl
-@[simp] theorem map_B (M : MontgomeryCurve R) (f : R →+* R') : (M.map f).B = f M.B := rfl
-
-/-- Two affine points are equal once their coordinates agree (the on-curve proof is irrelevant). -/
+/-- Two affine points are equal once their coordinates agree, the on-curve proof is irrelevant. -/
 theorem Point.some_ext {M : MontgomeryCurve R} {x₁ y₁ : R} {h₁ : M.Equation x₁ y₁}
     {x₂ y₂ : R} {h₂ : M.Equation x₂ y₂} (hx : x₁ = x₂) (hy : y₁ = y₂) :
     (Point.some x₁ y₁ h₁ : M.Point) = Point.some x₂ y₂ h₂ := by subst hx; subst hy; rfl
 
-/-- The point at infinity makes `M.Point` inhabited. -/
-instance (M : MontgomeryCurve R) : Inhabited M.Point := ⟨.zero⟩
-
 end MontgomeryCurve
-

@@ -1,4 +1,4 @@
-import FFEC.Edwards.AddFormula
+import FFEC.Messy.Edwards.AddFormula
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import PrimeCert

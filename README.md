@@ -33,6 +33,19 @@ Key models:
 - Ristretto
 - Weierstrass (already exists in Mathlib)
 
+## Curve models: equation, j-invariant, twist class (char ≠ 2, 3)
+
+| Model           | equation              | j-invariant                 | twist D  |
+|-----------------|-----------------------|-----------------------------|----------|
+| Weierstrass     |                       | WeierstrassCurve.j          |          |
+| Montgomery      | By² = x³ + Ax² + x    | 256·(A²−3)³/(A²−4)          | [B]      |
+| Twisted Edwards | ax² + y² = 1 + dx²y²  | 16·(a²+14ad+d²)³/(ad(a−d)⁴) | [a]      |
+| Ristretto       | (quotient of Edwards) | = base Edwards j            | = base's |
+
+Weierstrass — Silverman AEC III.1
+Montgomery — Costello–Smith 2018, §2.1
+Twisted Edwards — Bernstein–Lange 2008, §2
+Ristretto — Hamburg, Decaf 2015 (prime-order group on an Edwards curve).
 
 ## Roadmap
 

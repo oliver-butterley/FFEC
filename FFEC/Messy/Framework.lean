@@ -1,4 +1,4 @@
-import FFEC.Field
+import FFEC.Messy.Field
 
 /-!
 # Framework: the transfer theorem
@@ -47,4 +47,3 @@ noncomputable def GroupTransfer.crossAddEquiv (t : GroupTransfer Pt G) (t' : Gro
   letI := Equiv.add t.equiv
   letI := Equiv.add t'.equiv
   (t.equiv.addEquiv).trans (t'.equiv.addEquiv).symm
-

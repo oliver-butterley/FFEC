@@ -1,4 +1,4 @@
-import FFEC.Edwards.AddFormulaCerts
+import FFEC.Messy.Edwards.AddFormulaCerts
 
 /-!
 # TwistedEdwardsCurve explicit addition agrees with the transported Weierstrass group law
@@ -185,4 +185,3 @@ example (E : TwistedEdwardsCurve F) (P : E.Point) : P + (-P) = 0 := add_neg_canc
 
 
 end TwistedEdwardsCurve
-
