@@ -8,7 +8,7 @@ variable (p : Nat) [Fact p.Prime] [Fact (3 < p)]
 notation "𝔽["p"]" => GaloisField p 1
 
 abbrev J :=  𝔽[p] × 𝔽[p]ˣ
--- (j, D) : J
+-- (j, D) : IsomCl
 -- j fixes the curve up to iso — over the algebraic closure 𝔽̄
 -- (j, D) fixes the curve up to iso — over 𝔽
 -- (j, D, model, coordinates) specific equation
@@ -45,4 +45,5 @@ instance ellRel : Setoid (J p) where
       have : (k1 * k2) ^ nJ j₃ = k1 ^ nJ j₃ * (k2 ^ nJ j₃) := by rw [mul_pow]
       rw [this, ← hk1, ← hk2, ← mul_assoc, inv_mul_cancel_right]
 
-abbrev EllipticCurveUpToIso := Quotient (ellRel p)
+/-- The `𝔽[p]` isomorphism classes of elliptic curves over `𝔽[p]`. -/
+abbrev IsomCl := Quotient (ellRel p)
