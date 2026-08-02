@@ -15,12 +15,12 @@ maxSynthPendingDepth = 3
 [[require]]
 name = "PrimeCert"
 git = "https://github.com/b-mehta/PrimeCert.git"
-rev = "15fd61770c9a893af0f5cb7893ea98b7d0bf8d52"
+# rev = "15fd61770c9a893af0f5cb7893ea98b7d0bf8d52"
 
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "v4.30.0"
+# rev = "v4.30.0"
 
 [[lean_lib]]
 name = "FFEC"
