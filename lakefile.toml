@@ -4,23 +4,20 @@ keywords = ["math"]
 defaultTargets = ["FFEC"]
 
 [leanOptions]
-pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+pp.unicode.fun = true
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
-weak.linter.style.header = false # not a Mathlib-bound project; no per-file copyright headers
+weak.linter.style.header = false
 maxSynthPendingDepth = 3
 
-# Pratt/Pocklington primality certificates (`prime_cert%` / `pock%`); discharges `p_prime`.
-# Listed before mathlib so Mathlib's transitive-dep versions take precedence (lake resolution).
-[[require]]
-name = "PrimeCert"
-git = "https://github.com/b-mehta/PrimeCert.git"
-# rev = "15fd61770c9a893af0f5cb7893ea98b7d0bf8d52"
+# [[require]]
+# name = "PrimeCert"
+# git = "https://github.com/b-mehta/PrimeCert.git"
+# TODO: reactivate this and the proof which uses it when updated
 
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-# rev = "v4.30.0"
 
 [[lean_lib]]
 name = "FFEC"
