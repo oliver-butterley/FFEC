@@ -68,47 +68,30 @@ variable [Fact (3 < p)]
 --   exact ⟨j, fun M => hj M.A⟩
 open MontgomeryCurve
 
-open Classical in
-/-- A Montgomery model for the class `J`.  When `J` admits a Montgomery parameter we pick a
-genuine root `A` (so the `j`-invariant is correct, see `j_of_MontgomeryCurveOfJ`) and take `B`
-to be a representative of the twist `D = (Quotient.out J).2`.  Otherwise we return a
-nondegenerate fallback curve (`A = 0`, `B = 1`), whose `j` is *not* `J`'s. -/
+/-- A Montgomery model for the class `α`.  Admissibility lets us pick a genuine root `A` of the
+inversion cubic (so the `j`-invariant comes out right, see `j_of_MontgomeryCurveOfJ`), and we take
+`B` to be the representative of the twist `D = (Quotient.out α.ic).2`. -/
 noncomputable def MontgomeryCurveOfJ (α : AdmissibleIsomCl p) : MontgomeryCurve 𝔽[p] :=
-  { A := 0
-    B := 1
-    nondegen := by
-      have h4 : (4 : 𝔽[p]) ≠ 0 := by
-        have hp : p.Prime := Fact.out
-        have h3 : 3 < p := Fact.out
-        intro h4
-        have hdvd : p ∣ 4 :=
-          (CharP.cast_eq_zero_iff 𝔽[p] p 4).mp (by exact_mod_cast h4)
-        have hle : p ≤ 4 := Nat.le_of_dvd (by norm_num) hdvd
-        have hpeq : p = 4 := by omega
-        rw [hpeq] at hp
-        exact absurd hp (by decide)
-      have he : (1 : 𝔽[p]) * ((0 : 𝔽[p]) ^ 2 - 4) = -4 := by ring
-      rw [he, isUnit_iff_ne_zero, neg_ne_zero]
-      exact h4 }
--- TODO: check the above and correct. Why isn't α used?
+  { A := Exists.choose α.is_admissible
+    B := ((Quotient.out α.ic).2 : 𝔽[p])
+    nondegen :=
+      isUnit_iff_ne_zero.mpr
+        (mul_ne_zero (Units.ne_zero _) (Exists.choose_spec α.is_admissible).1) }
 
-/-- The `j`-invariant of `MontgomeryCurveOfJ` is correct **provided** the class admits a
-Montgomery parameter.  This cannot be dropped: a class whose inversion cubic has no square
-root in `𝔽[p]` has no Montgomery model at all, so the fallback curve's `j` differs. -/
+/-- The `j`-invariant of `MontgomeryCurveOfJ` is that of the class it was built from.  This uses
+admissibility essentially: a class whose inversion cubic has no root in `𝔽[p]` has no Montgomery
+model at all. -/
 theorem j_of_MontgomeryCurveOfJ (α : AdmissibleIsomCl p) :
-    (MontgomeryCurveOfJ p J).j = (Quotient.out J).1 := by
-  unfold MontgomeryCurve.j MontgomeryCurveOfJ
-  rw [dif_pos h]
-  exact h.choose_spec.2
--- TODO: correct this
+    (MontgomeryCurveOfJ p α).j = (Quotient.out α.ic).1 :=
+  (Exists.choose_spec α.is_admissible).2
 
 /-- The point sets of the Weierstrass and Montgomery models are in bijection.
 
-TODO: this is only a genuine isomorphism when `HasMontgomeryParam p J` holds (otherwise the two
-curves have different `j`-invariants and are not isomorphic).  Even then it requires the explicit
-Weierstrass ↔ Montgomery coordinate change (`x ↦ B·u − A/3`, etc.). -/
-def Weierstrass.toMontgomeryCurve : WeierstrassCurve.Affine.Point (WeierstrassOfJ p J) ≃
-    MontgomeryCurve.Point (MontgomeryCurveOfJ p J) := by
+TODO: this still needs the explicit Weierstrass ↔ Montgomery coordinate change
+(`x ↦ B·u − A/3`, etc.). -/
+def Weierstrass.toMontgomeryCurve (α : AdmissibleIsomCl p) :
+    WeierstrassCurve.Affine.Point (WeierstrassOfJ p α.ic) ≃
+    MontgomeryCurve.Point (MontgomeryCurveOfJ p α) := by
   sorry
 -- TODO: insert explict formula for this. Probably by cases for point at infinity.
 

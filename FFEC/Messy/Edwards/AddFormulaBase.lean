@@ -226,7 +226,7 @@ theorem pointEquiv_addFormula_inverse (E : TwistedEdwardsCurve F) {x y : F}
     E.pointEquiv (E.addFormula (.mk x y h) (.mk (-x) y h'))
       = E.pointEquiv (.mk x y h) + E.pointEquiv (.mk (-x) y h') := by
   have hadd : E.addFormula (.mk x y h) (.mk (-x) y h')
-      = .mk 0 1 (by simp [TwistedEdwardsCurve.Equation]) := by
+      = .mk 0 1 (show E.Equation 0 1 by simp [TwistedEdwardsCurve.Equation]) := by
     simp only [TwistedEdwardsCurve.addFormula, E.addCoords_inv h h']
   rw [hadd, pointEquiv_zero_one, E.pointEquiv_neg h h', add_neg_cancel]
 

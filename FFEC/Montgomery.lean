@@ -36,6 +36,11 @@ theorem Point.some_ext {M : MontgomeryCurve R} {x₁ y₁ : R} {h₁ : M.Equatio
     {x₂ y₂ : R} {h₂ : M.Equation x₂ y₂} (hx : x₁ = x₂) (hy : y₁ = y₂) :
     (Point.some x₁ y₁ h₁ : M.Point) = Point.some x₂ y₂ h₂ := by subst hx; subst hy; rfl
 
+/-- The class `ic` admits a Montgomery `A`-parameter over `𝔽[p]`: the inversion cubic
+`256·(A²−3)³/(A²−4) = j` has a nondegenerate root.
+- TODO: Exposed so that downstream modules can
+`Exists.choose` the parameter out of it. -/
+@[expose]
 def isAdmissible {p : Nat} [Fact p.Prime] [Fact (3 < p)] (ic : IsomCl p) : Prop :=
   ∃ a : 𝔽[p], a ^ 2 - 4 ≠ 0 ∧ 256 * (a ^ 2 - 3) ^ 3 / (a ^ 2 - 4) = (Quotient.out ic).1
 -- TODO: check this
