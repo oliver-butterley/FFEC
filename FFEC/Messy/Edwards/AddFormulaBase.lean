@@ -115,7 +115,7 @@ Weierstrass zero. -/
 theorem pointEquiv_zero_one (E : TwistedEdwardsCurve F) (h : E.Equation 0 1) :
     E.pointEquiv (TwistedEdwardsCurve.Point.mk 0 1 h) = 0 := by
   simp only [TwistedEdwardsCurve.pointEquiv, Equiv.trans_apply, TwistedEdwardsCurve.pointEquivMont,
-    MontgomeryCurve.pointEquiv, Equiv.coe_fn_mk, dif_pos, if_pos]
+    MontgomeryCurve.pointEquiv, Equiv.coe_fn_mk, dite_eq_left, ite_eq_left]
   rfl
 
 omit [NeZero (2 : F)] [DecidableEq F] in
@@ -134,7 +134,7 @@ theorem pointEquiv_some (E : TwistedEdwardsCurve F) {x y : F} (h : E.Equation x 
         ((WeierstrassCurve.Affine.equation_iff_nonsingular).mp
           (MontgomeryCurve.equation_toW E.toMontgomery (E.forward_onCurve h hx))) := by
   simp only [TwistedEdwardsCurve.pointEquiv, Equiv.trans_apply, TwistedEdwardsCurve.pointEquivMont,
-    MontgomeryCurve.pointEquiv, Equiv.coe_fn_mk, dif_neg hx]
+    MontgomeryCurve.pointEquiv, Equiv.coe_fn_mk, dite_eq_right hx]
 
 /-- **The bridge respects negation**: `pointEquiv (−x, y) = −(pointEquiv (x, y))`
 (TwistedEdwardsCurve negation is `(x,y) ↦ (−x, y)`; on the W side `negY = −y` as `a₁ = a₃ = 0`). -/
@@ -153,7 +153,7 @@ theorem pointEquiv_neg (E : TwistedEdwardsCurve F) {x y : F}
         have hc : E.pointEquiv (TwistedEdwardsCurve.Point.mk 0 y h)
             = (E.toMontgomery).pointEquiv (.some 0 0 (by simp [MontgomeryCurve.Equation])) := by
           simp only [TwistedEdwardsCurve.pointEquiv, Equiv.trans_apply,
-            TwistedEdwardsCurve.pointEquivMont, Equiv.coe_fn_mk, dif_pos, if_neg hy1]
+            TwistedEdwardsCurve.pointEquivMont, Equiv.coe_fn_mk, dite_eq_left, ite_eq_right hy1]
         rw [hc]
         simp only [MontgomeryCurve.pointEquiv, Equiv.coe_fn_mk, mul_zero,
           WeierstrassCurve.Affine.Point.neg_some, WeierstrassCurve.Affine.Point.some.injEq,
@@ -193,7 +193,7 @@ theorem pointEquiv_eq_some (E : TwistedEdwardsCurve F) {x y : F}
     · have hc : E.pointEquiv (TwistedEdwardsCurve.Point.mk 0 (-1) h)
           = (E.toMontgomery).pointEquiv (.some 0 0 (by simp [MontgomeryCurve.Equation])) := by
         simp only [TwistedEdwardsCurve.pointEquiv, Equiv.trans_apply,
-          TwistedEdwardsCurve.pointEquivMont, Equiv.coe_fn_mk, dif_pos, if_neg hne1]
+          TwistedEdwardsCurve.pointEquivMont, Equiv.coe_fn_mk, dite_eq_left, ite_eq_right hne1]
       rw [hc]
       simp only [MontgomeryCurve.pointEquiv, Equiv.coe_fn_mk, mul_zero]
   · exact ⟨_, pointEquiv_some E h hx⟩

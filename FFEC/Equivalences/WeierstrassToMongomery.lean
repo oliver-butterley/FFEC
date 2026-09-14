@@ -5,6 +5,8 @@ public import Mathlib
 
 public section
 
+open EllipticCurve
+
 variable (p : Nat) [Fact p.Prime]
 
 /- TODO: move the info about `WeierstrassCurve` to an appropriate home. -/

@@ -88,7 +88,7 @@ theorem add_some_onCurve (M : MontgomeryCurve F) {x₁ y₁ x₂ y₂ : F}
       = M.B * (M.B * ((y₂ - y₁) / (x₂ - x₁)) ^ 2 - M.A - x₁ - x₂) := by
     simp only [hWdef, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.slope,
       WeierstrassCurve.Affine.negY, MontgomeryCurve.toWeierstrass]
-    rw [if_neg (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
+    rw [ite_eq_right (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
     field_simp; ring
   have hAY : W.addY (M.B * x₁) (M.B * x₂) (M.B ^ 2 * y₁)
         (W.slope (M.B * x₁) (M.B * x₂) (M.B ^ 2 * y₁) (M.B ^ 2 * y₂))
@@ -97,7 +97,7 @@ theorem add_some_onCurve (M : MontgomeryCurve F) {x₁ y₁ x₂ y₂ : F}
     simp only [hWdef, WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY,
       WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.slope,
       WeierstrassCurve.Affine.negY, MontgomeryCurve.toWeierstrass]
-    rw [if_neg (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
+    rw [ite_eq_right (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
     field_simp; ring
   -- Transfer the on-`W` fact back to the Montgomery curve via `equation_ofW`.
   rw [hAX, hAY] at hWeq
@@ -130,13 +130,13 @@ theorem add_some (M : MontgomeryCurve F) {x₁ y₁ x₂ y₂ : F}
   refine ⟨?_, ?_⟩
   · simp only [WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.slope,
       WeierstrassCurve.Affine.negY, MontgomeryCurve.toWeierstrass]
-    rw [if_neg (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
+    rw [ite_eq_right (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
     field_simp
     ring
   · simp only [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY,
       WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.slope,
       WeierstrassCurve.Affine.negY, MontgomeryCurve.toWeierstrass]
-    rw [if_neg (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
+    rw [ite_eq_right (fun he => hx (mul_left_cancel₀ hB he)), M.slope_secant_eq hB hd]
     field_simp
     ring
 

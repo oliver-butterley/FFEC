@@ -259,11 +259,11 @@ noncomputable def TwistedEdwardsCurve.pointEquivMont (E : TwistedEdwardsCurve F)
           rcases mul_eq_zero.mp (show (y - 1) * (y + 1) = 0 by linear_combination hyeq) with h1 | h2
           · exact absurd (by linear_combination h1) hy
           · linear_combination h2
-        subst hy'; simp only [if_neg hy]; simp
+        subst hy'; simp only [ite_eq_right hy]; simp
     · have hy1 := E.one_sub_y_ne_zero h hx
       have hy2 := E.one_add_y_ne_zero h hx
       have hVne : toMontV x y ≠ 0 := div_ne_zero hy2 (mul_ne_zero hy1 hx)
-      simp only [dif_neg hx, dif_neg hVne]
+      simp only [dite_eq_right hx, dite_eq_right hVne]
       simp only [ofMontX_toMont hx hy1 hy2, ofMontY_toMont hy1]
   right_inv := by
     have hne : (-1 : F) ≠ 1 := fun hh => MontgomeryCurve.two_ne_zero (by linear_combination -hh)
@@ -280,7 +280,7 @@ noncomputable def TwistedEdwardsCurve.pointEquivMont (E : TwistedEdwardsCurve F)
           have key : u * (u ^ 2 + E.toMontgomery.A * u + 1) = 0 := by
             rw [MontgomeryCurve.Equation, hv] at hM; linear_combination -hM
           exact (mul_eq_zero.mp key).resolve_right (E.no_root u)
-        subst hv; subst hu0; simp [if_neg hne]
+        subst hv; subst hu0; simp [ite_eq_right hne]
       · have hu0 : u ≠ 0 := by
           intro hu; subst hu
           rw [MontgomeryCurve.Equation] at hM
@@ -288,7 +288,7 @@ noncomputable def TwistedEdwardsCurve.pointEquivMont (E : TwistedEdwardsCurve F)
           exact hv ((pow_eq_zero_iff (by norm_num)).mp ((mul_eq_zero.mp hBv).resolve_left hBne))
         have hu1 := E.u_add_one_ne_zero hM
         have hx' : ofMontX u v ≠ 0 := div_ne_zero hu0 hv
-        simp only [dif_neg hv, dif_neg hx']
+        simp only [dite_eq_right hv, dite_eq_right hx']
         simp only [toMontU_ofMont hu1, toMontV_ofMont hu0 hv hu1]
 
 /-- Compose to the Weierstrass anchor: `TwistedEdwardsCurve ≃ MontgomeryCurve ≃ Weierstrass`. -/

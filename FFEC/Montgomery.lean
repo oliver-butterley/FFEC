@@ -11,6 +11,8 @@ public section
 A Montgomery curve `B y² = x³ + A x² + x` with nondegeneracy `IsUnit (B (A² − 4))`.
 -/
 
+open EllipticCurve
+
 variable {R : Type*} [CommRing R]
 
 /-- A Montgomery curve `B y² = x³ + A x² + x` with nondegeneracy condition. -/
