@@ -74,18 +74,18 @@ open MontgomeryCurve
 inversion cubic (so the `j`-invariant comes out right, see `j_of_MontgomeryCurveOfJ`), and we take
 `B` to be the representative of the twist `D = (Quotient.out α.ic).2`. -/
 noncomputable def MontgomeryCurveOfJ (α : AdmissibleIsomCl p) : MontgomeryCurve 𝔽[p] :=
-  { A := Exists.choose α.is_admissible
+  { A := α.A
     B := ((Quotient.out α.ic).2 : 𝔽[p])
     nondegen :=
       isUnit_iff_ne_zero.mpr
-        (mul_ne_zero (Units.ne_zero _) (Exists.choose_spec α.is_admissible).1) }
+        (mul_ne_zero (Units.ne_zero _) α.A_sq_sub_four_ne_zero) }
 
 /-- The `j`-invariant of `MontgomeryCurveOfJ` is that of the class it was built from.  This uses
 admissibility essentially: a class whose inversion cubic has no root in `𝔽[p]` has no Montgomery
 model at all. -/
 theorem j_of_MontgomeryCurveOfJ (α : AdmissibleIsomCl p) :
     (MontgomeryCurveOfJ p α).j = (Quotient.out α.ic).1 :=
-  (Exists.choose_spec α.is_admissible).2
+  α.j_A
 
 /-- The point sets of the Weierstrass and Montgomery models are in bijection.
 

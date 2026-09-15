@@ -3,6 +3,20 @@ public import Mathlib.FieldTheory.Finite.GaloisField
 
 public section
 
+
+/-! # Elliptic curves (over fields of characteristic `3 < p`)
+
+Consider an elliptic curve over the field `𝔽ₚ` where the field has prime characteristic `p`. We
+require that `3 < p`. Attached to any elliptic curve is the `j`-invariant. Additionally each curve
+has its twist parameter `D`. Whilst `j` fixes the curve up to isomorphism over the algebraic closure
+`𝔽̄ₚ`, `(j, D)` fixes the curve up to isomorphism over 𝔽.
+
+The idea is to have an inherent concept of the curve, independent of any specific equations. Then we
+have multiple different models which can be used to represent a given curve.
+
+
+-/
+
 namespace EllipticCurve
 
 variable (p : Nat) [Fact p.Prime] [Fact (3 < p)]
@@ -10,24 +24,23 @@ variable (p : Nat) [Fact p.Prime] [Fact (3 < p)]
 notation "𝔽["p"]" => GaloisField p 1
 
 abbrev J :=  𝔽[p] × 𝔽[p]ˣ
--- (j, D) : IsomCl
--- j fixes the curve up to iso — over the algebraic closure 𝔽̄
--- (j, D) fixes the curve up to iso — over 𝔽
+-- j fixes the curve up to isomorphism over the algebraic closure 𝔽̄
+-- (j, D) fixes the curve up to isomorphism over 𝔽
 -- (j, D, model, coordinates) specific equation
 
-/-- `1728 ≠ 0` in `𝔽[p]`, because `1728 = 2⁶·3³` and `3 < p`.  This is what makes the two
-exceptional `j`-invariants `0` and `1728` distinct, and hence `nJ` well defined by its cases. -/
-theorem cast_1728_ne_zero : (1728 : 𝔽[p]) ≠ 0 := by
-  have hp : p.Prime := Fact.out
-  have h3 : 3 < p := Fact.out
-  intro h
-  have hdvd : p ∣ 1728 := by
-    have h' : ((1728 : ℕ) : 𝔽[p]) = 0 := by exact_mod_cast h
-    exact (CharP.cast_eq_zero_iff 𝔽[p] p 1728).mp h'
-  rw [show (1728 : ℕ) = 2 ^ 6 * 3 ^ 3 by norm_num] at hdvd
-  rcases (Nat.Prime.dvd_mul hp).mp hdvd with h' | h' <;>
-    · have := Nat.le_of_dvd (by norm_num) (hp.dvd_of_dvd_pow h')
-      omega
+-- /-- `1728 ≠ 0` in `𝔽[p]`, because `1728 = 2⁶·3³` and `3 < p`.  This is what makes the two
+-- exceptional `j`-invariants `0` and `1728` distinct, and hence `nJ` well defined by its cases. -/
+-- theorem cast_1728_ne_zero : (1728 : 𝔽[p]) ≠ 0 := by
+--   have hp : p.Prime := Fact.out
+--   have h3 : 3 < p := Fact.out
+--   intro h
+--   have hdvd : p ∣ 1728 := by
+--     have h' : ((1728 : ℕ) : 𝔽[p]) = 0 := by exact_mod_cast h
+--     exact (CharP.cast_eq_zero_iff 𝔽[p] p 1728).mp h'
+--   rw [show (1728 : ℕ) = 2 ^ 6 * 3 ^ 3 by norm_num] at hdvd
+--   rcases (Nat.Prime.dvd_mul hp).mp hdvd with h' | h' <;>
+--     · have := Nat.le_of_dvd (by norm_num) (hp.dvd_of_dvd_pow h')
+--       omega
 
 variable {p} in
 /-- The order of `Aut(E)` for an elliptic curve `E/𝔽[p]` with `j`-invariant `x`, under the
@@ -47,21 +60,15 @@ noncomputable def nJ (x : 𝔽[p]) : Nat :=
 
 variable {p}
 
-omit [Fact (3 < p)] in
-@[simp] theorem nJ_zero : nJ (0 : 𝔽[p]) = 6 := by simp [nJ]
+-- omit [Fact (3 < p)] in
+-- @[simp] theorem nJ_zero : nJ (0 : 𝔽[p]) = 6 := by simp [nJ]
 
-@[simp] theorem nJ_1728 : nJ (1728 : 𝔽[p]) = 4 := by
-  simp [nJ, cast_1728_ne_zero p]
+-- @[simp] theorem nJ_1728 : nJ (1728 : 𝔽[p]) = 4 := by
+--   simp [nJ, cast_1728_ne_zero p]
 
-omit [Fact (3 < p)] in
-theorem nJ_of_ne {x : 𝔽[p]} (h0 : x ≠ 0) (h1728 : x ≠ 1728) : nJ x = 2 := by
-  simp [nJ, h0, h1728]
-
-omit [Fact (3 < p)] in
-/-- `nJ` only ever takes the values Silverman's table allows. -/
-theorem nJ_mem {x : 𝔽[p]} : nJ x = 2 ∨ nJ x = 4 ∨ nJ x = 6 := by
-  unfold nJ
-  split_ifs <;> simp
+-- omit [Fact (3 < p)] in
+-- theorem nJ_of_ne {x : 𝔽[p]} (h0 : x ≠ 0) (h1728 : x ≠ 1728) : nJ x = 2 := by
+--   simp [nJ, h0, h1728]
 
 variable (p)
 
